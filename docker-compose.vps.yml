@@ -67,7 +67,8 @@ services:
       - certbot-var:/var/www/certbot
     entrypoint: >
       sh -c "certbot certonly --webroot -w /var/www/certbot
-      --email pierre.alexis@gmail.com --agree-tos --no-eff-email
+      --email pierre.alexis.56@gmail.com --agree-tos --no-eff-email
+      --force-renewal
       -d nextoffer.cloud -d www.nextoffer.cloud"
     depends_on:
       - nginx
