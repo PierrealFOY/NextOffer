@@ -1,0 +1,78 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_URL: "postgresql://${DB_USER}:${PASSWORD}@db:5432/${DATABASE}"
+      SERP_API_KEY: ${SERP_API_KEY}
+      FRANCETRAVAIL_CLIENT_ID: ${FRANCETRAVAIL_CLIENT_ID}
+      FRANCETRAVAIL_CLIENT_SECRET: ${FRANCETRAVAIL_CLIENT_SECRET}
+      MAILGUN_API_KEY: ${MAILGUN_API_KEY}
+    networks:
+      - app-network
+
+  db:
+    image: postgres:13
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${PASSWORD}
+      - POSTGRES_DB=${DATABASE}
+    networks:
+      - app-network
+
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.local.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-network
+
+  ggshield:
+    image: gitguardian/ggshield
+    volumes:
+      - .:/app
+    ports:
+      - "29170-29180:29170-29180"
+    entrypoint: /bin/sh -c "ggshield auth login --verbose"
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:

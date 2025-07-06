@@ -1,0 +1,7 @@
+.env
+# conf nginx cert
+nginx/certbot-etc/live/nextoffer.cloud/
+nginx/certbot-etc/ssl-dhparams.pem
+
+# ggshield scn secrets
+.cache_ggshield

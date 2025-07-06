@@ -1,0 +1,145 @@
+<script setup lang="ts">
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as z from 'zod'
+import { ref } from 'vue'
+import axios from 'axios'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+
+const formSchema = toTypedSchema(
+  z.object({
+    username: z.string().min(2, {
+      message: 'Le nom d\'utilisateur doit contenir au moins 2 caractères.',
+    }),
+    email: z.string().email({
+      message: 'Veuillez saisir une adresse email valide.',
+    }),
+    password: z.string().min(6, {
+      message: 'Le mot de passe doit contenir au moins 6 caractères.',
+    }),
+    confirmPassword: z.string().min(6, { // Ajout d'un champ pour la confirmation
+      message: 'Veuillez confirmer votre mot de passe.',
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Les mots de passe ne correspondent pas.",
+    path: ["confirmPassword"],
+  })
+);
+
+
+// 2. Initialisation du formulaire
+const form = useForm({
+  validationSchema: formSchema,
+})
+
+const errorMessage = ref<string | null>(null)
+const successMessage = ref<string | null>(null)
+const isLoading = ref(false)
+
+// 3. Fonction de soumission
+const onSubmit = form.handleSubmit(async (values) => {
+  errorMessage.value = null;
+  successMessage.value = null;
+  isLoading.value = true;
+
+  try {
+    await axios.post('http://localhost:8000/register', {
+      username: values.username,
+      email: values.email,
+      password: values.password,
+    });
+
+    successMessage.value = 'Inscription réussie ! Vous pouvez maintenant vous connecter.';
+    form.resetForm();
+
+  } catch (err) {
+    console.error('Registration error:', err);
+    if (axios.isAxiosError(err)) {
+      errorMessage.value = 'Erreur d\'inscription : ' + (err.response?.data?.detail || err.message);
+    } else if (err instanceof Error) {
+      errorMessage.value = 'Une erreur inattendue est survenue : ' + err.message;
+    } else {
+      errorMessage.value = 'Une erreur inconnue est survenue.';
+    }
+  } finally {
+    isLoading.value = false;
+  }
+})
+</script>
+
+<template>
+  <div class="flex justify-center items-center min-h-screen">
+    <Card class="w-96">
+      <CardHeader>
+        <CardTitle class="text-2xl font-bold text-center">Inscription</CardTitle>
+        <CardDescription class="text-center">Créez votre compte</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form @submit="onSubmit" class="space-y-6">
+          <FormField v-slot="{ componentField }" name="username">
+            <FormItem>
+              <FormLabel>Nom d'utilisateur</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="johndoe" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="email">
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="john.doe@example.com" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="password">
+            <FormItem>
+              <FormLabel>Mot de passe</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="••••••••" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="confirmPassword">
+            <FormItem>
+              <FormLabel>Confirmer le mot de passe</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="••••••••" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <Button type="submit" class="w-full" :disabled="isLoading">
+            <span v-if="isLoading">Inscription en cours...</span>
+            <span v-else>S'inscrire</span>
+          </Button>
+
+          <p v-if="successMessage" class="text-green-500 text-sm mt-4 text-center">
+            {{ successMessage }}
+          </p>
+          <p v-if="errorMessage" class="text-red-500 text-sm mt-4 text-center">
+            {{ errorMessage }}
+          </p>
+        </form>
+      </CardContent>
+    </Card>
+  </div>
+</template>

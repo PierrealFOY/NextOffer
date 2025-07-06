@@ -1,0 +1,83 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    restart: always
+    networks:
+      - app-network
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_URL: "postgresql://${DB_USER}:${PASSWORD}@db:5432/${DATABASE}"
+      SERP_API_KEY: ${SERP_API_KEY}
+      FRANCETRAVAIL_CLIENT_ID: ${FRANCETRAVAIL_CLIENT_ID}
+      FRANCETRAVAIL_CLIENT_SECRET: ${FRANCETRAVAIL_CLIENT_SECRET}
+      MAILGUN_API_KEY: ${MAILGUN_API_KEY}
+
+  db:
+    image: postgres:13
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${PASSWORD}
+      - POSTGRES_DB=${DATABASE}
+    networks:
+      - app-network
+
+  adminer:
+    image: adminer:latest
+    restart: always
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: always
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-1
+    ports:
+      - "50000:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.vps.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certbot-etc:/etc/letsencrypt:ro
+      - certbot-var:/var/www/certbot
+
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-network
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/www/certbot
+    entrypoint: >
+      sh -c "certbot certonly --webroot -w /var/www/certbot
+      --email pierre.alexis@gmail.com --agree-tos --no-eff-email
+      -d nextoffer.cloud -d www.nextoffer.cloud"
+    depends_on:
+      - nginx
+    networks:
+      - app-network
+
+volumes:
+  pgdata:
+  certbot-etc:
+  certbot-var:
+
+networks:
+  app-network:

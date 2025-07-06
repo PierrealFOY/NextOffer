@@ -1,0 +1,5 @@
+-- init.sql
+CREATE ROLE myuser WITH LOGIN PASSWORD 'testpass';
+ALTER DATABASE myDatabaseScraping OWNER TO myuser;
+-- Optionally, grant all privileges on the database to the user
+GRANT ALL PRIVILEGES ON DATABASE myDatabaseScraping TO myuser;
