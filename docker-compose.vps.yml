@@ -60,20 +60,34 @@ services:
     networks:
       - app-network
 
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/www/certbot
-    entrypoint: >
-      sh -c "certbot certonly --webroot -w /var/www/certbot
-      --email pierre.alexis.56@gmail.com --agree-tos --no-eff-email
-      --force-renewal
-      -d nextoffer.cloud -d www.nextoffer.cloud"
-    depends_on:
-      - nginx
-    networks:
-      - app-network
+  # certbot:
+  #   image: certbot/certbot
+  #   volumes:
+  #     - certbot-etc:/etc/letsencrypt
+  #     - certbot-var:/var/www/certbot
+  #   entrypoint: >
+  #     sh -c "certbot certonly --webroot -w /var/www/certbot
+  #     --email pierre.alexis.56@gmail.com --agree-tos --no-eff-email
+  #     --force-renewal
+  #     -d nextoffer.cloud -d www.nextoffer.cloud"
+  #   depends_on:
+  #     - nginx
+  #   networks:
+  #     - app-network
+
+  # certbot-renew: TODO: add cron job to renew
+  #   image: certbot/certbot
+  #   volumes:
+  #     - certbot-etc:/etc/letsencrypt
+  #     - certbot-var:/var/www/certbot
+  #   entrypoint: >
+  #     sh -c "certbot renew --webroot -w /var/www/certbot && nginx -s reload"
+  #   depends_on:
+  #     - nginx
+  #   networks:
+  #     - app-network
+  #   restart: unless-stopped
+
 
 volumes:
   pgdata:
