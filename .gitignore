@@ -2,6 +2,7 @@
 # conf nginx cert
 nginx/certbot-etc/live/nextoffer.cloud/
 nginx/certbot-etc/ssl-dhparams.pem
+nginx/certbot-etc/options-ssl-nginx.conf
 
 # ggshield scn secrets
 .cache_ggshield
