@@ -3,7 +3,7 @@
 certbot-etc/live/nextoffer.cloud/
 certbot-etc/ssl-dhparams.pem
 certbot-etc/options-ssl-nginx.conf
-certbot-etc/live/nextoffer.cloud/privkey.pem
+certbot-etc/
 
 # ggshield scn secrets
 .cache_ggshield
