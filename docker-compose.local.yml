@@ -63,13 +63,13 @@ services:
     networks:
       - app-network
 
-  ggshield:
-    image: gitguardian/ggshield
-    volumes:
-      - .:/app
-    ports:
-      - "29170-29180:29170-29180"
-    entrypoint: /bin/sh -c "ggshield auth login --verbose"
+  # ggshield:
+  #   image: gitguardian/ggshield
+  #   volumes:
+  #     - .:/app
+  #   ports:
+  #     - "29170-29180:29170-29180"
+  #   entrypoint: /bin/sh -c "ggshield auth login --verbose"
 
 volumes:
   pgdata:
