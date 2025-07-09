@@ -7,36 +7,31 @@ import axios from 'axios'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 
 const formSchema = toTypedSchema(
-  z.object({
-    username: z.string().min(2, {
-      message: 'Le nom d\'utilisateur doit contenir au moins 2 caractères.',
+  z
+    .object({
+      username: z.string().min(2, {
+        message: "Le nom d'utilisateur doit contenir au moins 2 caractères.",
+      }),
+      email: z.string().email({
+        message: 'Veuillez saisir une adresse email valide.',
+      }),
+      password: z.string().min(6, {
+        message: 'Le mot de passe doit contenir au moins 6 caractères.',
+      }),
+      confirmPassword: z.string().min(6, {
+        // Ajout d'un champ pour la confirmation
+        message: 'Veuillez confirmer votre mot de passe.',
+      }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: 'Les mots de passe ne correspondent pas.',
+      path: ['confirmPassword'],
     }),
-    email: z.string().email({
-      message: 'Veuillez saisir une adresse email valide.',
-    }),
-    password: z.string().min(6, {
-      message: 'Le mot de passe doit contenir au moins 6 caractères.',
-    }),
-    confirmPassword: z.string().min(6, { // Ajout d'un champ pour la confirmation
-      message: 'Veuillez confirmer votre mot de passe.',
-    }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Les mots de passe ne correspondent pas.",
-    path: ["confirmPassword"],
-  })
-);
-
+)
 
 // 2. Initialisation du formulaire
 const form = useForm({
@@ -49,40 +44,39 @@ const isLoading = ref(false)
 
 // 3. Fonction de soumission
 const onSubmit = form.handleSubmit(async (values) => {
-  errorMessage.value = null;
-  successMessage.value = null;
-  isLoading.value = true;
+  errorMessage.value = null
+  successMessage.value = null
+  isLoading.value = true
 
   try {
-    await axios.post('http://localhost:8000/register', {
+    await axios.post('http://localhost:8000/api/auth/register', {
       username: values.username,
       email: values.email,
       password: values.password,
-    });
+    })
 
-    successMessage.value = 'Inscription réussie ! Vous pouvez maintenant vous connecter.';
-    form.resetForm();
-
+    successMessage.value = 'Inscription réussie ! Vous pouvez maintenant vous connecter.'
+    form.resetForm()
   } catch (err) {
-    console.error('Registration error:', err);
+    console.error('Registration error:', err)
     if (axios.isAxiosError(err)) {
-      errorMessage.value = 'Erreur d\'inscription : ' + (err.response?.data?.detail || err.message);
+      errorMessage.value = "Erreur d'inscription : " + (err.response?.data?.detail || err.message)
     } else if (err instanceof Error) {
-      errorMessage.value = 'Une erreur inattendue est survenue : ' + err.message;
+      errorMessage.value = 'Une erreur inattendue est survenue : ' + err.message
     } else {
-      errorMessage.value = 'Une erreur inconnue est survenue.';
+      errorMessage.value = 'Une erreur inconnue est survenue.'
     }
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 })
 </script>
 
 <template>
-  <div class="flex justify-center items-center min-h-screen">
+  <div class="flex min-h-screen items-center justify-center">
     <Card class="w-96">
       <CardHeader>
-        <CardTitle class="text-2xl font-bold text-center">Inscription</CardTitle>
+        <CardTitle class="text-center text-2xl font-bold">Inscription</CardTitle>
         <CardDescription class="text-center">Créez votre compte</CardDescription>
       </CardHeader>
       <CardContent>
@@ -132,10 +126,10 @@ const onSubmit = form.handleSubmit(async (values) => {
             <span v-else>S'inscrire</span>
           </Button>
 
-          <p v-if="successMessage" class="text-green-500 text-sm mt-4 text-center">
+          <p v-if="successMessage" class="mt-4 text-center text-sm text-green-500">
             {{ successMessage }}
           </p>
-          <p v-if="errorMessage" class="text-red-500 text-sm mt-4 text-center">
+          <p v-if="errorMessage" class="mt-4 text-center text-sm text-red-500">
             {{ errorMessage }}
           </p>
         </form>

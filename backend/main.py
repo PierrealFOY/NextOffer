@@ -13,7 +13,7 @@ from utils.colorText import colorText
 settings = Settings()
 
 app = FastAPI(
-    title="Job Scraper API",
+    title="NextOffer API",
     description="A FastAPI backend for aggregating job listings from various sources.",
     version="0.1.0",
 )
@@ -32,11 +32,11 @@ def on_startup():
     create_db_tables() # create tables for all tables
     print("Database tables created (if they didn't exist).")
     print(colorText("---------------------------------------------------", "vert_fonce"))
-    print(colorText("     Welcome to the Job Scraper API! 🌞", "vert_fonce"))
+    print(colorText("     Welcome to the NextOffer API! 🌞", "vert_fonce"))
     print(colorText("---------------------------------------------------", "vert_fonce"))
-app.include_router(auth_router.router)
-app.include_router(jobs_router.router)
+app.include_router(auth_router.router, prefix="/api")
+app.include_router(jobs_router.router, prefix="/api")
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the Job Scraper API! Visit /docs for API documentation."}
+    return {"message": "Welcome to the NextOffer API! Visit /docs for API documentation."}
