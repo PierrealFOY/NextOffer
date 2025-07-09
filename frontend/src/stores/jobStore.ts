@@ -3,8 +3,15 @@ import type { Job } from '../types/Job'
 import { useAuthStore } from './authStore'
 import type { User } from '@/types/User'
 import { useToast } from '@/components/ui/toast/use-toast'
+import { h } from 'vue'
+import ToastHeartFillUp from '@/animations/ToastHeartFillUp.vue'
+import { showNetworkErrorToast } from '@/utils/toastUtils'
 
 const { toast } = useToast()
+
+const API_URL = import.meta.env.VITE_API_URL
+console.log('API_URL', API_URL)
+console.log('All envs:', import.meta.env)
 
 export const useJobStore = defineStore('jobStore', {
   state: () => ({
@@ -35,10 +42,31 @@ export const useJobStore = defineStore('jobStore', {
     },
   },
   actions: {
+    async toggleLikeWithFeedback(jobId: string) {
+      const job = this.getJobById(jobId)
+      if (!job) return
+
+      const isAlreadyLiked = job.liked
+
+      const result = await this.toggleLikeJob(jobId, isAlreadyLiked)
+
+      if (result) {
+        toast({
+          title: isAlreadyLiked ? 'Job retiré !' : 'Job liké !',
+          description: isAlreadyLiked
+            ? `Le job ${job.title} a été retiré de vos favoris.`
+            : h('div', { class: 'flex items-center space-x-2' }, [
+                h('span', 'Le job a été ajouté à vos favoris !'),
+                h(ToastHeartFillUp, {}),
+              ]),
+          class: isAlreadyLiked ? 'bg-gray-300 text-orange-700' : 'bg-gray-100 text-green-700',
+        })
+      }
+    },
     async fetchJobs(offset: number = 0, limit: number = 20) {
       this.isLoading = true
       try {
-        const res = await fetch(`http://localhost:8000/jobs?offset=${offset}&limit=${limit}`)
+        const res = await fetch(`${API_URL}/api/jobs?offset=${offset}&limit=${limit}`)
 
         if (!res.ok) {
           const errorText = await res.text()
@@ -63,7 +91,7 @@ export const useJobStore = defineStore('jobStore', {
     },
     async fetchJobById(id: string) {
       try {
-        const res = await fetch(`http://localhost:8000/jobs/${id}`)
+        const res = await fetch(`${API_URL}/api/jobs/${id}`)
 
         if (!res.ok) {
           const errorText = await res.text()
@@ -84,129 +112,48 @@ export const useJobStore = defineStore('jobStore', {
         console.error('Failed to fetch job id:', error)
       }
     },
-    // toggleLikeJob(jobId: string) {
-    //   const index = this.jobs.findIndex((job) => job.id === jobId)
-    //   if (index !== -1) {
-    //     const job = this.jobs[index]
-    //     job.liked = !job.liked
-
-    //     const authStore = useAuthStore()
-    //     if (job.liked) authStore.toggleFavoriteJob(jobId)
-    //   }
-    // },
     async likeJob(jobId: string) {
-      if (!this.currentUser?.id) {
-        console.error('User ID is missing — cannot like job.')
-        const authStore = useAuthStore()
-
-        if (!authStore.isAuthenticated) {
-          toast({
-            title: 'Impossible de liker le job !',
-            description: 'Il faut être connecté pour liker un job',
-            class: 'bg-gray-300 text-red-700',
-          })
-        }
-        return
-      }
+      const job = this.jobs.find((j) => j.id === jobId)
+      if (!job) return
 
       try {
-        const response = await fetch('http://localhost:8000/jobs/liked-jobs', {
+        const response = await fetch(`${API_URL}/jobs/${jobId}/like`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ job_id: jobId, user_id: this.currentUser.id }),
+          credentials: 'include',
         })
 
-        if (!response.ok) {
-          const errorText = await response.text()
-          console.error(`HTTP error! status: ${response.status}, body: ${errorText}`)
-          // Provide user feedback for conflict (already liked)
-          if (response.status === 409) {
-            toast({
-              title: 'Job déjà liké !',
-              description: 'Vous avez déjà liké ce job.',
-              class: 'bg-gray-300 text-orange-800',
-            })
-          } else {
-            toast({
-              title: 'Erreur lors du like !',
-              description: 'Impossible de liker ce job.',
-              class: 'bg-gray-300 text-red-700',
-            })
-          }
-          return
-        }
+        if (!response.ok) throw new Error('Like job failed')
 
-        // on successful like, immediately update the local job status
-        const jobToUpdate = this.jobs.find((job) => job.id === jobId)
-        if (jobToUpdate) {
-          jobToUpdate.liked = true
-          toast({
-            title: 'Job liké !',
-            description: 'Le job a été ajouté à vos favoris.',
-            class: 'bg-gray-300 text-green-700',
-          })
-        }
-
-        const data = await response.json()
-        return data
+        const jobUpdated = await response.json()
+        Object.assign(job, jobUpdated)
+        return true
       } catch (error) {
-        console.error('Failed to add the job as liked:', error)
-        toast({
-          title: 'Erreur réseau !',
-          description: 'Vérifiez votre connexion et réessayez.',
-          class: 'bg-gray-300 text-red-700',
-        })
+        console.error('Failed to like job:', error)
+        showNetworkErrorToast()
+        return false
       }
     },
-
     async unlikeJob(jobId: string) {
-      if (!this.currentUser?.id) {
-        console.error('User ID is missing — cannot unlike job.')
-        return
-      }
+      const job = this.jobs.find((j) => j.id === jobId)
+      if (!job) return
 
       try {
-        const url = `http://localhost:8000/jobs/liked-jobs/${jobId}?user_id=${this.currentUser.id}`
-        const response = await fetch(url, {
-          method: 'DELETE',
+        const response = await fetch(`${API_URL}/jobs/${jobId}/unlike`, {
+          method: 'POST',
+          credentials: 'include',
         })
 
-        if (!response.ok) {
-          const errorText = await response.text()
-          console.error(`HTTP error! status: ${response.status}, body: ${errorText}`)
-          toast({
-            title: 'Erreur lors du dé-like !',
-            description: 'Impossible de retirer ce job des favoris.',
-            class: 'bg-gray-300 text-red-700',
-          })
-          return
-        }
+        if (!response.ok) throw new Error('Unlike job failed')
 
-        // update the local job status
-        const jobToUpdate = this.jobs.find((job) => job.id === jobId)
-        if (jobToUpdate) {
-          jobToUpdate.liked = false
-          toast({
-            title: 'Job retiré !',
-            description: 'Le job a été retiré de vos favoris.',
-            class: 'bg-gray-300 text-orange-700',
-          })
-        }
-
-        const data = await response.json()
-        return data
+        const jobUpdated = await response.json()
+        Object.assign(job, jobUpdated)
+        return true
       } catch (error) {
         console.error('Failed to unlike job:', error)
-        toast({
-          title: 'Erreur réseau !',
-          description: 'Vérifiez votre connexion et réessayez.',
-          class: 'bg-gray-300 text-red-700',
-        })
+        showNetworkErrorToast()
+        return false
       }
     },
-
     async fetchLikedJobsInternal(): Promise<Job[]> {
       if (!this.currentUser?.id) {
         console.error('User ID is missing — cannot toggle like.')
@@ -214,14 +161,13 @@ export const useJobStore = defineStore('jobStore', {
       }
 
       try {
-        const response = await fetch(`http://localhost:8000/jobs/liked-jobs/${this.currentUser.id}`)
+        const response = await fetch(`${API_URL}/api/jobs/liked-jobs/${this.currentUser.id}`)
         if (!response.ok) {
           const errorText = await response.text()
           console.error(`HTTP error! status: ${response.status}, body: ${errorText}`)
           return []
         }
         const data: Job[] = await response.json()
-        console.log('liked jobs internal:', data)
         return data
       } catch (error) {
         console.error('Failed to fetch liked jobs internally:', error)
@@ -234,7 +180,7 @@ export const useJobStore = defineStore('jobStore', {
         return
       }
 
-      const likedJobsData = await this.fetchLikedJobsInternal(this.currentUser?.id)
+      const likedJobsData = await this.fetchLikedJobsInternal()
 
       this.jobs.forEach((job) => {
         job.liked = likedJobsData.some((likedJob) => likedJob.id === job.id)
@@ -242,11 +188,7 @@ export const useJobStore = defineStore('jobStore', {
       console.log('Liked jobs status synchronized.')
     },
     async toggleLikeJob(jobId: string, isAlreadyLiked: boolean) {
-      if (isAlreadyLiked) {
-        return this.unlikeJob(jobId)
-      } else {
-        return this.likeJob(jobId)
-      }
+      return isAlreadyLiked ? await this.unlikeJob(jobId) : await this.likeJob(jobId)
     },
     updateJob(updatedJob: Job) {
       const index = this.jobs.findIndex((job) => job.id === updatedJob.id)

@@ -36,7 +36,6 @@ const sanitizedDescription = computed(() =>
   jobData.value?.description ? DOMPurify.sanitize(jobData.value.description) : '',
 )
 const isFullScreenRoute = computed(() => route.path === `/jobDetails/${jobData.value?.id}`)
-console.log('isFullScreenRoute', isFullScreenRoute.value)
 const isFullScreen = computed(() => props.fullScreen || isFullScreenRoute.value)
 
 const goToJobDetailsPage = () => {
@@ -47,7 +46,6 @@ const goToJobDetailsPage = () => {
 const { isMobile, open } = useSidebar()
 
 const isHeaderVisible = inject('isHeaderVisible', ref(true))
-console.log('isHeaderVisible', isHeaderVisible.value)
 </script>
 
 <template>
@@ -57,10 +55,10 @@ console.log('isHeaderVisible', isHeaderVisible.value)
       {
         'mt-10 w-[85vw] self-start overflow-y-auto overflow-x-hidden pb-10':
           isFullScreen && !isMobile && !open,
-        'w-[85vw] mt-6': isMobile,
+        'mt-6 w-[85vw]': isMobile,
         'mt-10': isFullScreen && open && !isMobile,
-        'top-16 mt-16 h-[70%]': isHeaderVisible && !isFullScreen,
-        'top-0 mt-0 h-[85vh]': !isHeaderVisible && !isFullScreen,
+        'top-16 mt-16 h-[68%]': isHeaderVisible && !isFullScreen,
+        'top-2 mt-0 h-[85vh]': !isHeaderVisible && !isFullScreen,
       },
     ]"
   >
@@ -123,11 +121,11 @@ console.log('isHeaderVisible', isHeaderVisible.value)
         </div>
         <div
           :class="{
-            'h-40': !isFullScreen && isHeaderVisible,
-            'h-[12%]': !isFullScreen && !isHeaderVisible,
+            'h-[5%]': !isFullScreen && isHeaderVisible,
+            'max-h-64 min-h-64': !isFullScreen && !isHeaderVisible,
             'h-full': isFullScreen,
           }"
-          class="overflow-y-auto rounded bg-white/5 p-2 text-sm leading-relaxed transition-all duration-200 ease-in-out"
+          class="duration-400 overflow-y-auto rounded bg-white/5 p-2 text-sm leading-relaxed transition-all ease-in-out"
         >
           <div
             v-if="jobData?.description"

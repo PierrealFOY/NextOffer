@@ -1,4 +1,7 @@
 .env
+.env.local
+.env.prod
+
 # conf nginx cert
 certbot-etc/live/nextoffer.cloud/
 certbot-etc/ssl-dhparams.pem
