@@ -17,7 +17,7 @@
         </Button>
       </div>
 
-      <TerminalHeader @search="handleSearch" />
+      <TerminalHeader class="w-4/5" @search="handleSearch" />
       <span ref="sentinelRef" class="h-[1px] w-full"></span>
 
       <RouterView
