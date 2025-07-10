@@ -3,7 +3,6 @@
     :class="{ 'pl-6': isMobile }"
     class="flex items-baseline justify-center gap-2 text-xl text-accentPrimary dark:text-mintGreen"
   >
-    <span v-if="!isMobile" class="mb-4">Offres d'emploi:</span>
     <Search @search="handleSearch" />
   </div>
 </template>
