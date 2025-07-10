@@ -43,22 +43,24 @@ Ce projet a été réalisé avec ❤️ par un développeur full-stack passionn�
 ### 🌁 APIs utilisées
 
 - **France Travail** : API officielle française d’offres d’emploi.
-- **Remotive** : API externe d’offres d’emploi internationales.
+- **Remotive** : API externe d’offres d’emploi à distance internationales.
 
 Ces API sont appelées côté backend pour récupérer, filtrer et exposer les offres au frontend.
 
+ℹ️ Des variables d'environnement propres à l'environnement dev et à l'environnement production ont été ajouté et configurés. Le nombre de données chargé est plus faible en mode local qu'en mode production. Aussi, l'URL en local est localhost alors que l'URL en prod correspond au lien du site. Il était alors nécessaire d'adapter et mettre en place ce "switch" de mode.
+
 ### 📟 Commandes Docker principales
 
-- Pour lancer en local :
+- Pour lancer en local, depuis la racine du projet :
 
 ```bash
-    docker-compose -f docker-compose.local.yml up --build
+    docker compose -f docker-compose.local.yml up --build
 ```
 
-- Pour lancer en production (sur VPS) :
+- Pour lancer en production (sur VPS), depuis la racine du projet :
 
 ```bash
-    docker-compose -f docker-compose.vps.yml up --build -d
+    docker compose -f docker-compose.vps.yml up --build -d
 ```
 
 ### ☎️ Contact
