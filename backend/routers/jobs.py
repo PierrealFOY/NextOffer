@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 import asyncio
 from starlette.status import HTTP_404_NOT_FOUND
+from core.config import settings
 
 
 router = APIRouter(
@@ -42,11 +43,12 @@ class JobResponse(JobBase):
 @router.get("/", response_model=List[JobResponse])
 async def get_jobs(
     offset: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    limit: int = Query(settings.JOB_LIMIT, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
     jobs_data_from_aggregator = await JobAggregator.aggregate_jobs(offset=offset, limit=limit, db=db)
-    
+    print(f"limit: {limit}")
+
     response_jobs = []
     for job_obj in jobs_data_from_aggregator:
         try:
@@ -58,8 +60,7 @@ async def get_jobs(
 
 @router.get("/{id}", response_model=JobResponse)
 async def get_job_by_id(id: str, db: Session = Depends(get_db)):
-    jobs_data_from_aggregator = await JobAggregator.aggregate_jobs(offset=0, limit=1000, db=db)
-    
+    jobs_data_from_aggregator = await JobAggregator.aggregate_jobs(offset=0, limit=settings.JOB_LIMIT, db=db)
     for job_obj in jobs_data_from_aggregator:  # job_obj est un objet Job
             
         if str(job_obj.id) == str(id):
