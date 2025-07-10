@@ -32,7 +32,6 @@ onMounted(() => {
 const likedJobs = computed(() => store.likedJobs)
 
 const updateJobLiked = (jobId: string) => {
-  console.log('MyJobsView received liked update for ID:', jobId)
   emit('update:liked', jobId)
 }
 </script>

@@ -12,7 +12,7 @@ from database import get_db
 from auth.schemas import Token, TokenData, UserSchema as AuthUserSchema
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_schem = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_schem = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()

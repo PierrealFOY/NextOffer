@@ -29,8 +29,6 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import NavUser from './NavUser.vue'
 import ToggleMode from './ToggleMode.vue'
-const isDarkClassMode = document.documentElement.classList.contains('dark')
-console.log('isDarkClassMode', isDarkClassMode)
 const authStore = useAuthStore()
 const isLoggedIn = computed(() => authStore.isAuthenticated)
 const route = useRoute()
@@ -287,8 +285,7 @@ onMounted(() => {
     variant="sidebar"
     collapsible="none"
     v-else-if="!isMobile"
-    class="z-30 flex h-full transform flex-col border-r border-border bg-baseMedium shadow-br-light transition-all duration-300 ease-in-out dark:bg-neutral-800 dark:shadow-br-dark"
-    :class="{ 'w-56': open, 'w-18': !open }"
+    class="sticky z-30 flex h-screen transform flex-col border-r border-border bg-baseMedium shadow-br-light transition-all duration-300 ease-in-out dark:bg-neutral-800 dark:shadow-br-dark"
   >
     <SidebarHeader
       class="flex items-center p-4"
@@ -401,8 +398,8 @@ onMounted(() => {
       </SidebarGroup>
     </SidebarContent>
 
-    <SidebarFooter class="mt-auto flex flex-col p-4" :class="{ 'flex-col items-center': !open }">
-      <div v-if="open" class="flex w-full flex-col space-y-2">
+    <SidebarFooter class="flex h-full flex-col p-4" :class="{ 'flex-col items-center': !open }">
+      <div v-if="open" class="flex w-full flex-col justify-end space-y-2">
         <template v-if="isLoggedIn && user !== null">
           <NavUser :user="user" />
           <a

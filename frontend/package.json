@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
-    "build-only": "vite build",
+    "build-only": "vite build --mode production",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/"
@@ -27,6 +27,7 @@
     "reka-ui": "^2.3.0",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
+    "ts-node": "^10.9.2",
     "vee-validate": "^4.15.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.1",

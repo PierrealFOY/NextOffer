@@ -85,35 +85,20 @@ const emit = defineEmits<{
 
 const { toast } = useToast()
 
-const handletoggleLikeJob = () => {
-  console.log('JobCard: Emitting update:liked for job ID:', props.job.id)
-  emit('update:liked', props.job.id)
-  if (props.job.liked) {
+const handletoggleLikeJob = async () => {
+  if (!authStore.isLoggedIn) {
     toast({
-      // title: 'Job liké !',
-      description: h('div', { class: 'flex items-center space-x-2' }, [
-        h('span', 'Job liké !'),
-        h(ToastHeartFillUp, {}),
-      ]),
-      duration: 5000,
-      class: 'bg-gray-100 text-green-700',
+      title: 'Impossible de liker le job !',
+      description: 'Il faut être connecté pour liker un job',
+      class: 'bg-gray-300 text-red-700',
     })
-  } else {
-    if (authStore.isLoggedIn) {
-      toast({
-        title: 'Job unliké !',
-        description: `Le job ${props.job.title} a été retiré de votre liste`,
-        class: 'bg-gray-300 text-red-700',
-      })
-    } else {
-      toast({
-        title: 'Impossible de liker le job !',
-        description: 'Il faut être connecté pour liker un job',
-        class: 'bg-gray-300 text-red-700',
-      })
-    }
+    return
   }
+
+  await jobStore.toggleLikeWithFeedback(props.job.id)
+  emit('update:liked', props.job.id)
 }
+
 
 const jobSeen = (jobId: string) => {
   if (props.job.url) {
@@ -141,11 +126,9 @@ const jobData = computed(() => props.job ?? jobFromStore.value)
 const { isMobile } = useSidebar()
 const goToJobDetails = (job: Job) => {
   if (!isMobile.value) {
-    console.log('clicked not mobile:')
     emit('select', job)
   } else if (isMobile.value) {
     if (jobData.value?.id) {
-      console.log('clicked mobile:')
       router.push(`/jobDetails/${jobData.value.id}`)
     }
   }
