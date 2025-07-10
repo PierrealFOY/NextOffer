@@ -285,8 +285,7 @@ onMounted(() => {
     variant="sidebar"
     collapsible="none"
     v-else-if="!isMobile"
-    class="z-30 flex h-full transform flex-col border-r border-border bg-baseMedium shadow-br-light transition-all duration-300 ease-in-out dark:bg-neutral-800 dark:shadow-br-dark"
-    :class="{ 'w-56': open, 'w-18': !open }"
+    class="sticky z-30 flex h-screen transform flex-col border-r border-border bg-baseMedium shadow-br-light transition-all duration-300 ease-in-out dark:bg-neutral-800 dark:shadow-br-dark"
   >
     <SidebarHeader
       class="flex items-center p-4"

@@ -3,7 +3,7 @@
     :initial="{ opacity: 0, y: 20 }"
     :enter="{ opacity: 1, y: 0 }"
     transition="ease-in-out"
-    class="mx-auto w-full px-2 py-16 text-center md:px-4"
+    class="mx-auto w-full overflow-y-visible px-2 py-16 text-center md:px-4"
   >
     <div
       class="fixed right-1/4 top-8 h-28 w-28 items-center justify-center overflow-hidden rounded-[41%_59%_64%_36%_/_40%_25%_75%_60%] bg-gray-200 shadow-xl md:h-48 md:w-48 lg:flex"
@@ -12,12 +12,12 @@
     </div>
 
     <div
-      :class="[
-        '-top-26 pointer-events-none absolute z-0 rotate-6 rounded-[6%_64%_42%_34%_/_48%_27%_42%_65%] bg-mintGreen opacity-20 md:opacity-40',
-        open ? 'left-[-5rem] w-[50vw] md:w-[55vw]' : 'left-0 w-full',
-      ]"
-      class="md:h-50 h-40"
-    ></div>
+      class="md:h-50 rounded-custom-shape pointer-events-none absolute right-2/4 z-0 h-40 rotate-6 bg-accentPrimary opacity-20 transition-all duration-300 ease-in-out dark:bg-mintGreen md:opacity-40"
+      :class="{
+        'w-1/3 md:w-2/5': open,
+        'md:w-1/2': !open,
+      }"
+    />
 
     <h1 class="mt-28 text-4xl font-extrabold text-mintGreen md:text-5xl">À propos</h1>
 
@@ -84,6 +84,7 @@
     </div>
 
     <div
+      :class="{ 'md:w-[80%]': open, 'md:w-[90%]': !open }"
       class="absolute bottom-[-2rem] left-1/2 flex h-32 w-[90%] -translate-x-1/2 rotate-3 transform items-center overflow-hidden rounded-[89%_11%_76%_24%_/_50%_23%_25%_20%] bg-mintGreen opacity-20 md:h-48 md:opacity-30"
     ></div>
 
@@ -144,3 +145,9 @@ onMounted(() => {
   mailto.value = `mailto:${user}@${domain}`
 })
 </script>
+
+<style>
+.rounded-custom-shape {
+  border-radius: 6% 64% 42% 34% / 48% 27% 42% 65%;
+}
+</style>

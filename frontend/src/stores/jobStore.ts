@@ -10,8 +10,6 @@ import { showNetworkErrorToast } from '@/utils/toastUtils'
 const { toast } = useToast()
 
 const API_URL = import.meta.env.VITE_API_URL
-console.log('API_URL', API_URL)
-console.log('All envs:', import.meta.env)
 
 export const useJobStore = defineStore('jobStore', {
   state: () => ({
