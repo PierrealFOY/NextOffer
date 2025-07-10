@@ -37,6 +37,8 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        VITE_API_URL: https://nextoffer.cloud
     restart: always
     networks:
       - app-network
