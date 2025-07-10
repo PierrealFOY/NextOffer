@@ -5,6 +5,7 @@
     :initial="{ opacity: 1 }"
     :animate="{ opacity: [1, 0.2, 1] }"
     :transition="{ repeat: Infinity, duration: 1 }"
+    :class="{ 'mt-8': isMobile }"
     class="relative flex w-3/5 cursor-pointer items-center rounded border-2 border-accentPrimary dark:border-mintGreen md:w-2/5"
   >
     <span
@@ -13,19 +14,13 @@
     >
       _
     </span>
-    <span
-      v-if="isMobile"
-      class="animate-pulseSlow pl-2 text-sm text-accentPrimary dark:text-mintGreen"
-    >
-      rechercher
-    </span>
 
-    <div v-else class="flex items-center space-x-1">
+    <div class="flex items-center space-x-1">
       <input
         ref="searchInput"
         v-model="searchQuery"
         type="text"
-        class="w-1/4 border-b border-accentPrimary bg-transparent p-1 px-1 text-sm text-accentPrimary focus:w-full focus:outline-none"
+        class="w-3/4 border-b border-accentPrimary bg-transparent p-1 px-1 text-sm text-accentPrimary focus:w-full focus:outline-none"
         placeholder="Rechercher..."
         @keyup.enter="handleSearch"
         @blur="deactivateSearch"
