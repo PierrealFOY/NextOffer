@@ -24,7 +24,7 @@ class RemotiveService:
                     typeContrat=job.get("job_type", ""),
                     dateCreation=job.get("publication_date", ""),
                 )
-                for idx, job in enumerate(data.get("jobs", [])[:20])
+                for idx, job in enumerate(data.get("jobs", [])[:settings.JOB_LIMIT])
             ]
             return [JobResponse.from_orm(job) for job in jobs]
         except requests.exceptions.RequestException as e:
