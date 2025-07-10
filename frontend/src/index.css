@@ -4,14 +4,17 @@
 
 #app {
   height: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
 }
 
 body {
+  height: 100%;
   overflow-x: hidden;
   font-family: 'Raleway', sans-serif;
+}
+
+main {
+  flex: 1;
+  overflow-y: auto;
 }
 
 a {

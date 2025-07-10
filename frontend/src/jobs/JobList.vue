@@ -7,7 +7,6 @@
     <div
       :class="{
         'w-[80%]': !selectedJob && !isMobile,
-        'ml-4': !isMobile,
         'w-full': isMobile,
       }"
       class="flex flex-col overflow-y-auto overflow-x-hidden transition-all duration-300 ease-in-out"
@@ -18,10 +17,9 @@
             'rounded-sm border-2 border-accentPrimary dark:border-mintGreen':
               job.id === selectedJob?.id,
             'mx-1': isMobile,
-            'ml-32': open,
-            'w-3/4': !selectedJob,
+            'w-3/4': open,
           }"
-          class="m-4 mb-4 w-full max-w-full transition-all duration-300 hover:scale-[102%]"
+          class="m-4 mb-4 w-full max-w-full transition-all duration-300 ease-in-out hover:scale-[102%]"
         >
           <JobCard
             @update:seen="handleSeenJobUpdate"
@@ -57,10 +55,10 @@
 
     <div
       v-if="selectedJob && !isMobile"
-      :class="[open ? 'w-[50%]' : 'w-[60%]', 'transition-all duration-300', 'mt-2']"
+      :class="[open ? 'w-[100%]' : 'w-[60%]', 'transition-all duration-300', 'mt-2']"
     >
       <JobDetails
-        class="fixed right-4 top-16 mt-16 w-1/2 justify-end h-[80%] space-y-0 pl-2"
+        class="fixed"
         :job="selectedJob"
         @close="selectedJob = null"
         :selected-job="selectedJob"
