@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div class="relative">
     <SidebarApp
       v-if="!isMobile"
-      class="absolute top-0 z-40 min-h-screen shrink-0 md:block"
+      class="fixed left-0 top-0 z-40 min-h-screen shrink-0 md:block"
       :class="{ 'w-56': open, 'w-16': !open }"
       :open="open"
       :open-mobile="openMobile"
@@ -12,7 +12,8 @@
 
     <SidebarApp
       v-if="isMobile"
-      class="fixed inset-y-0 left-0 z-40 h-full w-64 overflow-y-auto md:hidden"
+      :class="{ 'hidden w-0': !openMobile, 'w-64': openMobile }"
+      class="fixed inset-y-0 left-0 z-40 h-full overflow-y-auto md:hidden"
       :open="open"
       :open-mobile="openMobile"
       ref="sidebarAppRef"
