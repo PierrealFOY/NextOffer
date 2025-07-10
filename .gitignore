@@ -1,6 +1,5 @@
+# ENVs
 .env
-.env.local
-.env.prod
 frontend/.env.local
 frontend/.env.production
 backend/.env.dev
@@ -11,6 +10,9 @@ backend/.env.prod
 certbot-etc/live/nextoffer.cloud/
 certbot-etc/ssl-dhparams.pem
 certbot-etc/options-ssl-nginx.conf
+certbot-etc/live/nextoffer.cloud/privkey.pem
+
+
 ./certbot-etc/
 
 # ggshield scn secrets
