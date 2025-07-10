@@ -7,10 +7,11 @@ from auth.schemas import JobResponse
 from services.external_apis.remotive import RemotiveService
 # from services.external_apis.serpapi import SerpAPIService
 from services.external_apis.francetravail import FranceTravailService
+from core.config import settings
 
 class JobAggregator:
     @staticmethod
-    async def aggregate_jobs(offset: int = 0, limit: int = 20, db: Session = None) -> List[JobResponse]:
+    async def aggregate_jobs(offset: int = 0, limit: int = settings.JOB_LIMIT, db: Session = None) -> List[JobResponse]:
         loop = asyncio.get_running_loop()
         remotive_future = loop.run_in_executor(None, RemotiveService.fetch_jobs)
         # serpapi_future = loop.run_in_executor(None, SerpAPIService.fetch_jobs)
