@@ -5,9 +5,15 @@
     :initial="{ opacity: 1 }"
     :animate="{ opacity: [1, 0.2, 1] }"
     :transition="{ repeat: Infinity, duration: 1 }"
-    :class="{ 'mt-8': isMobile }"
-    class="relative flex w-3/5 cursor-pointer items-center rounded border-2 border-accentPrimary dark:border-mintGreen md:w-2/5"
+    :class="{ 'mt-8 w-3/5': isMobile }"
+    class="relative mt-2 flex w-1/3 cursor-pointer rounded border-2 border-accentPrimary dark:border-mintGreen"
   >
+    <button
+      @click="handleSearch"
+      class="px-2 text-accentPrimary transition-colors hover:text-[#FFD700]"
+    >
+      <Search :size="20" />
+    </button>
     <span
       v-if="!isSearchActive"
       class="animate-pulseSlow pl-1 text-accentPrimary dark:text-mintGreen"
@@ -20,17 +26,11 @@
         ref="searchInput"
         v-model="searchQuery"
         type="text"
-        class="w-3/4 border-b border-accentPrimary bg-transparent p-1 px-1 text-sm text-accentPrimary focus:w-full focus:outline-none"
+        class="w-3/4 border-b border-accentPrimary bg-transparent p-1 px-1 text-sm text-accentPrimary placeholder:text-accentPrimary focus:w-full focus:outline-none dark:placeholder:text-mintGreen"
         placeholder="Rechercher..."
         @keyup.enter="handleSearch"
         @blur="deactivateSearch"
       />
-      <button
-        @click="handleSearch"
-        class="justify-end text-accentPrimary transition-colors hover:text-[#FFD700]"
-      >
-        <Search />
-      </button>
     </div>
   </div>
 </template>
