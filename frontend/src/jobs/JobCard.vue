@@ -29,7 +29,7 @@
           :href="job.url"
           target="_blank"
           class="cursor-pointer text-base text-accentSecondary underline transition hover:text-primary"
-          @click="jobSeen"
+          @click="(event) => jobSeen(job.id)"
         >
           Voir l'offre
         </a>
@@ -62,8 +62,7 @@
 import { Building2, BriefcaseBusiness, MapPin, Heart, Eye, Send, Calendar } from 'lucide-vue-next'
 import type { Job } from '../types/Job'
 import { useToast } from '@/components/ui/toast/use-toast'
-import ToastHeartFillUp from '@/animations/ToastHeartFillUp.vue'
-import { computed, h } from 'vue'
+import { computed } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useJobStore } from '@/stores/jobStore'
 import { useRoute, useRouter } from 'vue-router'
@@ -99,12 +98,11 @@ const handletoggleLikeJob = async () => {
   emit('update:liked', props.job.id)
 }
 
-
 const jobSeen = (jobId: string) => {
   if (props.job.url) {
     window.open(props.job.url, '_blank')
   } else {
-    goToJobDetails(jobId)
+    goToJobDetails(props.job)
   }
   emit('update:seen', props.job.id)
 }
