@@ -15,3 +15,7 @@ certbot-etc/options-ssl-nginx.conf
 
 # ggshield scn secrets
 .cache_ggshield
+
+# python files
+__pycache__/
+*.pyc
