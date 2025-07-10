@@ -1,6 +1,6 @@
 <template>
   <main
-    class="flex min-h-screen w-full items-center justify-center overflow-y-auto overflow-x-hidden text-foreground"
+    class="flex min-h-screen w-full items-stretch overflow-y-auto overflow-x-hidden text-foreground"
   >
     <div class="flex w-full flex-col p-4 transition-all duration-300">
       <div
@@ -17,7 +17,7 @@
         </Button>
       </div>
 
-      <TerminalHeader @search="handleSearch" />
+      <TerminalHeader class="w-4/5" @search="handleSearch" />
       <span ref="sentinelRef" class="h-[1px] w-full"></span>
 
       <RouterView

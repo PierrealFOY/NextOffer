@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-vue-next'
+import { BadgeCheck, ChevronsUpDown, LogOut } from 'lucide-vue-next'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -26,7 +26,6 @@ import { useRouter } from 'vue-router'
 const props = defineProps<{
   user: User
 }>()
-console.log('NavUser mounted')
 const authStore = useAuthStore()
 const router = useRouter()
 const currentUser = computed(() => authStore.currentUser)

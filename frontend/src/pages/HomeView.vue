@@ -53,15 +53,15 @@ setTimeout(() => {
 const goToJobs = () => {
   router.push('/offers')
 }
-const { isMobile } = useSidebar()
+const { isMobile, open } = useSidebar()
 </script>
 
 <template>
   <div
     :class="{
-      'w-full max-w-[80vw] overflow-y-auto overflow-x-hidden px-6': isMobile,
+      'max-w-screen w-full overflow-y-auto overflow-x-hidden px-6': isMobile,
     }"
-    class="flex w-full flex-col bg-background text-foreground md:-mx-36"
+    class="flex w-full flex-col bg-background text-foreground"
   >
     <section
       class="relative flex flex-col items-center justify-center px-2 py-20 text-center md:px-4 md:py-32"
@@ -70,7 +70,13 @@ const { isMobile } = useSidebar()
         class="animate-pulse-slow absolute inset-0 from-primary/10 to-secondary/10 opacity-30"
       ></div>
 
-      <div class="relative w-full md:w-4/5">
+      <div
+        :class="{
+          'md:max-w-[calc(100%-350px)]': open,
+          'md:max-w-[calc(100%-80px)]': !open,
+        }"
+        class="w-full transition-all duration-300 md:w-4/5 ease-in-out"
+      >
         <h1 ref="heroTitle" class="mb-4 flex text-center text-2xl font-extrabold md:text-5xl">
           <TextShadow v-if="!isMobile" class="leading-6">Trouvez l'emploi idéal</TextShadow>
           <p v-else-if="isMobile" class="pl-8 leading-10">Trouvez l'emploi idéal</p>

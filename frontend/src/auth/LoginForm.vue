@@ -36,13 +36,15 @@ const { toast } = useToast()
 const errorMessage = ref<string | null>(null)
 const isLoading = ref(false)
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const onSubmit = form.handleSubmit(async (values) => {
   errorMessage.value = null
   isLoading.value = true
 
   try {
     const response = await axios.post(
-      'http://localhost:8000/auth/token',
+      `${API_URL}/api/auth/token`,
       new URLSearchParams({
         username: values.username,
         password: values.password,
@@ -55,7 +57,7 @@ const onSubmit = form.handleSubmit(async (values) => {
     )
 
     const accessToken = response.data.access_token
-    const userMeResponse = await axios.get('http://localhost:8000/auth/users/me', {
+    const userMeResponse = await axios.get(`${API_URL}/api/auth/users/me`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

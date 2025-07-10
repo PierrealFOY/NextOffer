@@ -5,13 +5,19 @@ frontend/.env.production
 backend/.env.dev
 backend/.env.prod
 
+
 # conf nginx cert
 certbot-etc/live/nextoffer.cloud/
 certbot-etc/ssl-dhparams.pem
 certbot-etc/options-ssl-nginx.conf
+certbot-etc/live/nextoffer.cloud/privkey.pem
 
 
 ./certbot-etc/
 
 # ggshield scn secrets
 .cache_ggshield
+
+# python files
+__pycache__/
+*.pyc
