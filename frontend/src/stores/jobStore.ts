@@ -115,7 +115,7 @@ export const useJobStore = defineStore('jobStore', {
       if (!job) return
 
       try {
-        const response = await fetch(`${API_URL}/jobs/${jobId}/like`, {
+        const response = await fetch(`${API_URL}/api/jobs/${jobId}/like`, {
           method: 'POST',
           credentials: 'include',
         })
@@ -136,7 +136,7 @@ export const useJobStore = defineStore('jobStore', {
       if (!job) return
 
       try {
-        const response = await fetch(`${API_URL}/jobs/${jobId}/unlike`, {
+        const response = await fetch(`${API_URL}/api/jobs/${jobId}/unlike`, {
           method: 'POST',
           credentials: 'include',
         })
