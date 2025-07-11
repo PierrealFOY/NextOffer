@@ -37,6 +37,7 @@ services:
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
       args:
         VITE_API_URL: https://nextoffer.cloud
     restart: always
