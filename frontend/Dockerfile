@@ -8,8 +8,9 @@ RUN npm install
 
 COPY . .
 
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
+# ARG VITE_API_URL
+# ENV VITE_API_URL=$VITE_API_URL
+# RUN echo "VITE_API_URL=$VITE_API_URL" > .env.production
 
 RUN npm run build
 
