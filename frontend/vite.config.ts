@@ -8,6 +8,13 @@ export default defineConfig({
   plugins: [vue(), vueDevTools()],
   server: {
     allowedHosts: ['nextoffer.cloud', 'www.nextoffer.cloud'],
+    proxy: {
+      '/api': {
+        target: process.env.VITE_API_URL,
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   resolve: {
     alias: {
