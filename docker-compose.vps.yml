@@ -53,9 +53,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.vps.conf:/etc/nginx/conf.d/default.conf
       - ./certbot-etc:/etc/letsencrypt:ro
       - ./certbot-var:/var/www/certbot
+      - ./nginx/nginx.vps.conf:/etc/nginx/conf.d/default.conf:ro
 
     depends_on:
       - frontend
@@ -63,20 +63,20 @@ services:
     networks:
       - app-network
 
-  # certbot:
-  #   image: certbot/certbot
-  #   volumes:
-  #     - certbot-etc:/etc/letsencrypt
-  #     - certbot-var:/var/www/certbot
-  #   entrypoint: >
-  #     sh -c "certbot certonly --webroot -w /var/www/certbot
-  #     --email pierre.alexis.56@gmail.com --agree-tos --no-eff-email
-  #     --force-renewal
-  #     -d nextoffer.cloud -d www.nextoffer.cloud"
-  #   depends_on:
-  #     - nginx
-  #   networks:
-  #     - app-network
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./certbot-etc:/etc/letsencrypt
+      - ./certbot-var:/var/www/certbot
+    entrypoint: >
+      sh -c "certbot certonly --webroot -w /var/www/certbot
+      --email pierre.alexis.56@gmail.com --agree-tos --no-eff-email
+      --force-renewal
+      -d nextoffer.cloud -d www.nextoffer.cloud"
+    depends_on:
+      - nginx
+    networks:
+      - app-network
 
   # certbot-renew: TODO: add cron job to renew
   #   image: certbot/certbot
