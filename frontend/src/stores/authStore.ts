@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import type { User } from '../types/User'
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
     users: [] as User[],
@@ -38,7 +40,7 @@ export const useAuthStore = defineStore('authStore', {
         this.token = storedToken
         axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
         try {
-          const response = await axios.get('http://localhost:8000/auth/users/me')
+          const response = await axios.get(`${API_URL}/auth/users/me`)
           this.currentUser = response.data
           this.isLoggedIn = true
         } catch (error) {
