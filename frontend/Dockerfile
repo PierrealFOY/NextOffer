@@ -1,5 +1,5 @@
-# Dockerfile
-FROM node:18 AS builder
+# Dockerfile (Production)
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -11,16 +11,12 @@ COPY . .
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
-RUN echo "🧪 BUILD: VITE_API_URL = $VITE_API_URL"
-
 RUN echo "VITE_API_URL=$VITE_API_URL" > .env.production
-
 RUN npm run build
 
-# Nginx
+# NGINX
 FROM nginx:stable-alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
-
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
