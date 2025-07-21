@@ -17,7 +17,6 @@ defineOptions({
 })
 
 import JobList from '../jobs/JobList.vue'
-import JobCard from '../jobs/JobCard.vue'
 import { onMounted, computed } from 'vue'
 import { useJobStore } from '../stores/jobStore'
 
@@ -31,7 +30,7 @@ onMounted(() => {
   if (store.jobs.length === 0) store.fetchJobs()
 })
 
-const seenJobs = computed(() => store.jobs.filter((job) => job.seen))
+const seenJobs = computed(() => store.seenJobs)
 
 const updateJobSeen = (jobId: string) => {
   emit('update:seen', jobId)
