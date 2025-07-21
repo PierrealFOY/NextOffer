@@ -10,7 +10,6 @@ import { showNetworkErrorToast } from '@/utils/toastUtils'
 const { toast } = useToast()
 
 const API_URL = import.meta.env.VITE_API_URL
-console.log("API URL", API_URL)
 
 export const useJobStore = defineStore('jobStore', {
   state: () => ({
@@ -19,11 +18,13 @@ export const useJobStore = defineStore('jobStore', {
     hasMore: true,
     offset: 0,
     limit: 20,
-    _rawLikedJobs: [] as Job[],
   }),
   getters: {
     isJobAlreadyLiked: (state) => (jobId: string) => {
       return state.jobs.some((job) => job.id === jobId && job.liked)
+    },
+    isJobAlreadySeen: (state) => (jobId: string) => {
+      return state.jobs.some((job) => job.id === jobId && job.seen)
     },
     currentUser: (): User | null => useAuthStore().currentUser,
     getJobById: (state) => (id: string) => state.jobs.find((job) => job.id === id),
@@ -31,12 +32,12 @@ export const useJobStore = defineStore('jobStore', {
     seenJobs: (state) => state.jobs.filter((job) => job.seen),
     appliedJobs: (state) => state.jobs.filter((job) => job.seen && job.applicationSent),
     filteredJobs: (state) => (query: string) => {
-      const lower = query.toLowerCase()
+      const lower = query.toLowerCase() ?? ''
       return state.jobs.filter(
         (job) =>
-          job.title.toLowerCase().includes(lower) ||
-          job.company.toLowerCase().includes(lower) ||
-          job.location.toLowerCase().includes(lower),
+          (job.title && job.title.toLowerCase().includes(lower)) ||
+          (job.company && job.company.toLowerCase().includes(lower)) ||
+          (job.location && job.location.toLowerCase().includes(lower)),
       )
     },
   },
@@ -75,11 +76,12 @@ export const useJobStore = defineStore('jobStore', {
 
         const data: Job[] = await res.json()
 
-        const jobsWithLikedStatus = data.map((job) => ({ ...job, liked: false }))
+        const jobsWithLikedStatus = data.map((job) => ({ ...job, liked: false, seen: false }))
 
         this.jobs = offset === 0 ? jobsWithLikedStatus : [...this.jobs, ...jobsWithLikedStatus]
 
         await this.fetchLikedJobs()
+        await this.fetchSeenJobs()
 
         if (data.length < limit) this.hasMore = false
       } catch (error) {
@@ -103,8 +105,12 @@ export const useJobStore = defineStore('jobStore', {
         if (this.currentUser?.id) {
           const likedJobsForUser = await this.fetchLikedJobsInternal()
           data.liked = likedJobsForUser.some((likedJob) => likedJob.id === data.id)
+
+          const seenJobsForUser = await this.fetchSeenJobsInternal()
+          data.seen = seenJobsForUser.some((seenJob) => seenJob.id === data.id)
         } else {
           data.liked = false
+          data.seen = false
         }
         return data
       } catch (error) {
@@ -112,19 +118,39 @@ export const useJobStore = defineStore('jobStore', {
       }
     },
     async likeJob(jobId: string) {
-      const job = this.jobs.find((j) => j.id === jobId)
-      if (!job) return
+      const jobIdStr = jobId.toString()
+      const job = this.jobs.find((j) => j.id === jobIdStr)
+      if (!job) return false
+      if (this.isJobAlreadyLiked(jobId)) {
+        console.log(`Job ${jobIdStr} is already liked locally.`)
+        return true
+      }
 
       try {
-        const response = await fetch(`${API_URL}/api/jobs/${jobId}/like`, {
+        const authStore = useAuthStore()
+        const token = authStore.token
+        const response = await fetch(`${API_URL}/api/jobs/liked-jobs`, {
           method: 'POST',
-          credentials: 'include',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ job_id: jobIdStr }),
         })
 
-        if (!response.ok) throw new Error('Like job failed')
+        if (!response.ok) {
+          if (response.status === 409) {
+            console.warn(`Job ${jobIdStr} is already liked by the server`)
+            if (job) job.liked = true
+            return true
+          } else {
+            const errorText = await response.text()
+            throw new Error(`Faile on liking job action: ${response.status} - ${errorText}`)
+          }
+        }
 
         const jobUpdated = await response.json()
-        Object.assign(job, jobUpdated)
+        if (job) Object.assign(job, jobUpdated)
         return true
       } catch (error) {
         console.error('Failed to like job:', error)
@@ -134,18 +160,29 @@ export const useJobStore = defineStore('jobStore', {
     },
     async unlikeJob(jobId: string) {
       const job = this.jobs.find((j) => j.id === jobId)
-      if (!job) return
+      if (!job || !this.isJobAlreadyLiked(jobId)) return
 
       try {
-        const response = await fetch(`${API_URL}/api/jobs/${jobId}/unlike`, {
-          method: 'POST',
+        const authStore = useAuthStore()
+        const userId = authStore.currentUser?.id
+
+        if (!userId) {
+          throw new Error('User ID is missing')
+        }
+
+        const response = await fetch(`${API_URL}/api/jobs/liked-jobs/${jobId}?user_id=${userId}`, {
+          method: 'DELETE',
           credentials: 'include',
         })
 
         if (!response.ok) throw new Error('Unlike job failed')
 
         const jobUpdated = await response.json()
-        Object.assign(job, jobUpdated)
+        const index = this.jobs.findIndex((j) => j.id === jobId.toString())
+        if (index !== -1) {
+          this.jobs[index] = jobUpdated
+        }
+        job.liked = false
         return true
       } catch (error) {
         console.error('Failed to unlike job:', error)
@@ -194,6 +231,77 @@ export const useJobStore = defineStore('jobStore', {
       if (index !== -1) {
         this.jobs[index] = updatedJob
       }
+    },
+    async fetchSeenJobsInternal(): Promise<Job[]> {
+      if (!this.currentUser?.id) {
+        console.error('User ID is missing — cannot toggle like.')
+        return []
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/jobs/seen-jobs/${this.currentUser.id}`)
+        if (!response.ok) {
+          const errorText = await response.text()
+          console.error(`HTTP error! status: ${response.status}, body: ${errorText}`)
+          return []
+        }
+        const data: Job[] = await response.json()
+        return data
+      } catch (error) {
+        console.error('Failed to fetch seen jobs internally:', error)
+        return []
+      }
+    },
+    async seeJob(jobId: string) {
+      const job = this.jobs.find((j) => j.id === jobId)
+      if (!job) return false
+      if (this.isJobAlreadySeen(jobId)) return true
+
+      try {
+        const authStore = useAuthStore()
+        const token = authStore.token
+
+        const response = await fetch(`${API_URL}/api/jobs/${authStore.currentUser?.id}/seen-jobs`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ job_id: jobId }),
+        })
+
+        if (!response.ok) {
+          if (response.status === 409) {
+            console.warn(`Job ${jobId} already seen on the server`)
+            if (job) job.seen = true
+            return true
+          } else {
+            const errorText = await response.text()
+            throw new Error(`Fail on action see job: ${response.status} - ${errorText}`)
+          }
+        }
+
+        const jobUpdated = await response.json()
+        if (job) Object.assign(job, jobUpdated)
+        return true
+      } catch (error) {
+        console.error('Failed to see job:', error)
+        showNetworkErrorToast()
+        return false
+      }
+    },
+    async fetchSeenJobs() {
+      if (!this.currentUser?.id) {
+        console.error('User ID is missing — cannot fetch liked jobs.')
+        return
+      }
+
+      const seenJobsData = await this.fetchSeenJobsInternal()
+
+      this.jobs.forEach((job) => {
+        job.seen = seenJobsData.some((seenJob) => seenJob.id === job.id)
+      })
+      console.log('Seen jobs status synchronized.')
     },
     updateSeenJobs(jobId: string) {
       const index = this.jobs.findIndex((job) => job.id === jobId)

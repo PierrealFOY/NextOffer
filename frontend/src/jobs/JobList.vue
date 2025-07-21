@@ -26,6 +26,7 @@
             @update:liked="handleLikedUpdate"
             @update:applied="handleAppliedJobUpdate"
             @select="handleSelectJob"
+            :key="job.id + '-' + job.liked"
             :job="job"
             :applyOpacity="props.applyOpacity"
           />
@@ -111,9 +112,15 @@ const handleSelectJob = (job: Job) => {
 const handleLikedUpdate = (jobId: string) => {
   const isAlreadyLiked = store.isJobAlreadyLiked(jobId)
   store.toggleLikeJob(jobId, isAlreadyLiked)
+
+  const jobToUpdate = store.jobs.find((job) => job.id === jobId)
+  if (jobToUpdate) {
+    jobToUpdate.liked = !isAlreadyLiked
+  }
 }
+
 const handleSeenJobUpdate = (jobId: string) => {
-  store.updateSeenJobs(jobId)
+  store.seeJob(jobId)
 }
 const handleAppliedJobUpdate = (jobId: string) => {
   store.updateAppliedJobs(jobId)

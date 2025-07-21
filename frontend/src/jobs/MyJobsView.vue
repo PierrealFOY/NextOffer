@@ -15,6 +15,7 @@
         Likées
       </RouterLink>
       <RouterLink
+        :jobs="seenJobs"
         to="/myJobs/seen"
         class="pb-2 text-accentPrimary dark:text-mintGreen"
         :class="{
@@ -47,10 +48,11 @@ defineOptions({
 
 import { onMounted, computed } from 'vue'
 import { useJobStore } from '../stores/jobStore'
-import { useSidebar } from '@/components/ui/sidebar';
+import { useSidebar } from '@/components/ui/sidebar'
 
 const emit = defineEmits<{
   (e: 'update:liked', jobId: string): void
+  (e: 'update:seen', jobId: string): void
 }>()
 
 const store = useJobStore()
@@ -60,5 +62,6 @@ onMounted(() => {
 })
 
 const likedJobs = computed(() => store.likedJobs)
-const { isMobile, open } = useSidebar()
+const seenJobs = computed(() => store.likedJobs)
+const { open } = useSidebar()
 </script>

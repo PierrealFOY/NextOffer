@@ -38,6 +38,7 @@ export const routes: RouteRecordRaw[] = [
     path: '/account',
     component: AccountPage,
     props: true,
+    meta: { requiresAuth: true },
   },
   {
     path: '/forgot',
@@ -63,6 +64,7 @@ export const routes: RouteRecordRaw[] = [
     path: '/myJobs',
     component: MyJobsView,
     props: true,
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'liked',

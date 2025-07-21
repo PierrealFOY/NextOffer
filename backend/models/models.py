@@ -17,7 +17,6 @@ class Job(Base):
     description = Column(Text)
     typeContrat = Column(String)
     dateCreation = Column(Date)
-    users = relationship("User", secondary="liked_jobs")
     liked = Column(Boolean, default=False)
 
     def __init__(self,
@@ -81,6 +80,7 @@ class User(Base):
     reset_password_expires_at = Column(DateTime, nullable=True)
     # favorite_jobs = relationship("Job", secondary="favorite_jobs")
     liked_jobs = relationship("LikedJob", back_populates="user")
+    seen_jobs = relationship("SeenJob", back_populates="user")
     # jobs = relationship("Job", secondary="liked_jobs")
 
 # class FavoriteJob(Base):
@@ -98,4 +98,14 @@ class LikedJob(Base):
     job_id = Column(String, ForeignKey("jobs.id"))
 
     user = relationship("User", back_populates="liked_jobs")
+    job = relationship("Job", lazy="joined")
+
+class SeenJob(Base):
+    __tablename__ = "seen_jobs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    job_id = Column(String, ForeignKey("jobs.id"))
+
+    user = relationship("User", back_populates="seen_jobs")
     job = relationship("Job", lazy="joined")
