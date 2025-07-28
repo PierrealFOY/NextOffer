@@ -21,5 +21,13 @@ const authStore = useAuthStore()
 authStore.initializeAuth().finally(() => {
   app.use(router)
   app.use(MotionPlugin)
+  router.beforeEach((to, from, next) => {
+    const authStore = useAuthStore()
+    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+      next('/login')
+    } else {
+      next()
+    }
+  })
   app.mount('#app')
 })

@@ -6,6 +6,7 @@
       :isLoading="false"
       :jobs="appliedJobs"
       @update:applied="updateJobApplied"
+      :applyOpacity="false"
     />
   </div>
 </template>

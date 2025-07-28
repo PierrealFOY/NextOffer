@@ -1,15 +1,15 @@
 <template>
-  <!-- <div v-if="store.isLoading && store.jobs.length === 0" class="w-full">
+  <div v-if="store.isLoading && store.jobs.length === 0" class="w-full items-center self-center">
     <SkeletonJobs />
-  </div> -->
+  </div>
 
-  <div class="mt-2 flex h-[calc(100vh-80px)] w-full gap-4 overflow-x-hidden pt-4">
+  <div class="mt-2 flex h-[calc(100vh-80px)] w-full gap-4 pt-4">
     <div
       :class="{
         'w-[80%]': !selectedJob && !isMobile,
         'w-full': isMobile,
       }"
-      class="flex flex-col overflow-y-auto overflow-x-hidden transition-all duration-300 ease-in-out"
+      class="flex flex-col transition-all duration-300 ease-in-out"
     >
       <div v-for="job in props.jobs" :key="job.id" class="flex items-start space-x-4">
         <div
@@ -22,10 +22,9 @@
           class="m-4 mb-4 w-full max-w-full transition-all duration-300 ease-in-out hover:scale-[102%]"
         >
           <JobCard
-            @update:seen="handleSeenJobUpdate"
-            @update:liked="handleLikedUpdate"
-            @update:applied="handleAppliedJobUpdate"
+            :allowCardDetails="props.allowCardDetails"
             @select="handleSelectJob"
+            :key="job.id + '-' + job.liked"
             :job="job"
             :applyOpacity="props.applyOpacity"
           />
@@ -35,7 +34,7 @@
         </div>
       </div>
 
-      <div class="flex h-12 items-center justify-center text-gray-400">
+      <div class="my-6 flex h-12 items-center justify-center pb-10 text-gray-400">
         <Button
           class="bg-accentPrimary dark:bg-mintGreen dark:text-black"
           v-if="props.enableClickScroll && store.hasMore && !store.isLoading"
@@ -81,7 +80,7 @@
 import JobCard from './JobCard.vue'
 import type { Job } from '../types/Job'
 import { useJobStore } from '@/stores/jobStore'
-// import SkeletonJobs from '@/layout/SkeletonJobs.vue'
+import SkeletonJobs from '@/layout/SkeletonJobs.vue'
 import AskIfApplied from './AskIfApplied.vue'
 import { ref, onMounted } from 'vue'
 import JobDetails from './JobDetails.vue'
@@ -92,12 +91,14 @@ import { useSidebar } from '@/components/ui/sidebar'
 const props = withDefaults(
   defineProps<{
     enableClickScroll?: boolean
-    jobs: Job[]
     applyOpacity?: boolean
+    jobs: Job[]
+    allowCardDetails?: boolean
   }>(),
   {
     enableClickScroll: true,
     applyOpacity: true,
+    allowCardDetails: true,
   },
 )
 const store = useJobStore()
@@ -106,17 +107,7 @@ const loadMoreTrigger = ref<HTMLElement | null>(null)
 const { isMobile, open } = useSidebar()
 
 const handleSelectJob = (job: Job) => {
-  selectedJob.value = job
-}
-const handleLikedUpdate = (jobId: string) => {
-  const isAlreadyLiked = store.isJobAlreadyLiked(jobId)
-  store.toggleLikeJob(jobId, isAlreadyLiked)
-}
-const handleSeenJobUpdate = (jobId: string) => {
-  store.updateSeenJobs(jobId)
-}
-const handleAppliedJobUpdate = (jobId: string) => {
-  store.updateAppliedJobs(jobId)
+  if (props.allowCardDetails) selectedJob.value = job
 }
 
 const loadMore = async () => {

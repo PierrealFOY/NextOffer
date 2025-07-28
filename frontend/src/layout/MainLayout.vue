@@ -1,7 +1,5 @@
 <template>
-  <main
-    class="flex min-h-screen w-full items-stretch overflow-y-auto overflow-x-hidden text-foreground"
-  >
+  <main class="flex min-h-screen w-full items-stretch overflow-x-hidden text-foreground">
     <div class="flex w-full flex-col p-4 transition-all duration-300">
       <div
         v-show="!openMobile && isMobile"
@@ -20,19 +18,11 @@
       <TerminalHeader class="w-4/5" @search="handleSearch" />
       <span ref="sentinelRef" class="h-[1px] w-full"></span>
 
-      <RouterView
-        class="h-full w-full"
-        v-slot="{ Component }"
-        :jobs="filteredJobs"
-        :is-loading="store.isLoading"
-        @update:liked="handleLikedUpdate"
-        @update:seen="handleSeenJobUpdate"
-        @update:applied="handleAppliedJobUpdate"
-      >
+      <RouterView class="h-full w-full" v-slot="{ Component }" :is-loading="jobStore.isLoading">
         <component :is="Component" />
       </RouterView>
 
-      <div v-if="!isMobile" class="fixed right-4 top-4">
+      <div v-if="!isMobile" class="fixed right-4 top-4 mr-4">
         <ToggleMode />
       </div>
     </div>
@@ -40,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, provide } from 'vue'
+import { ref, onMounted, onUnmounted, provide } from 'vue'
 import { useJobStore } from '@/stores/jobStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useSidebar } from '@/components/ui/sidebar'
@@ -49,20 +39,10 @@ import ToggleMode from '../layout/ToggleMode.vue'
 import { Menu } from 'lucide-vue-next'
 
 const authStore = useAuthStore()
-const store = useJobStore()
+const jobStore = useJobStore()
 
 // search
-const searchQuery = ref('')
-const filteredJobs = computed(() => store.filteredJobs(searchQuery.value))
-const handleSearch = (query: string) => (searchQuery.value = query)
-
-// Liked / Seen / Applied
-const handleLikedUpdate = (jobId: string) => {
-  const isAlreadyLiked = store.isJobAlreadyLiked(jobId)
-  store.toggleLikeJob(jobId, isAlreadyLiked)
-}
-const handleSeenJobUpdate = (jobId: string) => store.updateSeenJobs(jobId)
-const handleAppliedJobUpdate = (jobId: string) => store.updateAppliedJobs(jobId)
+const handleSearch = (query: string) => jobStore.setSearchQuery(query)
 
 // Sidebar mobile
 const { isMobile, setOpenMobile, openMobile } = useSidebar()
@@ -90,8 +70,8 @@ onMounted(() => {
 
 onMounted(async () => {
   await authStore.initializeAuth()
-  if (store.jobs.length === 0 && !store.isLoading) {
-    store.fetchJobs()
+  if (jobStore.jobs.length === 0 && !jobStore.isLoading) {
+    jobStore.fetchJobs()
   }
 })
 

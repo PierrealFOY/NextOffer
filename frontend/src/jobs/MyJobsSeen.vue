@@ -4,9 +4,9 @@
     <JobList
       :enableInfiniteScroll="false"
       :isLoading="false"
-      :jobs="seenJobs"
+      :jobs="store.seenJobs"
       :applyOpacity="false"
-      @update:seen="updateJobSeen"
+      :allowCardDetails="false"
     />
   </div>
 </template>
@@ -17,23 +17,12 @@ defineOptions({
 })
 
 import JobList from '../jobs/JobList.vue'
-import JobCard from '../jobs/JobCard.vue'
-import { onMounted, computed } from 'vue'
+import { onMounted } from 'vue'
 import { useJobStore } from '../stores/jobStore'
-
-const emit = defineEmits<{
-  (e: 'update:seen', jobId: string): void
-}>()
 
 const store = useJobStore()
 
 onMounted(() => {
   if (store.jobs.length === 0) store.fetchJobs()
 })
-
-const seenJobs = computed(() => store.jobs.filter((job) => job.seen))
-
-const updateJobSeen = (jobId: string) => {
-  emit('update:seen', jobId)
-}
 </script>
