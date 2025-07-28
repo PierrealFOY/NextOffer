@@ -41,6 +41,8 @@ services:
       args:
         VITE_API_URL: https://nextoffer.cloud
     restart: always
+    volumes:
+      - frontend-dist:/app
     networks:
       - app-network
     depends_on:
@@ -57,6 +59,7 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - ./certbot-var:/var/www/certbot
       - ./nginx/nginx.vps.conf:/etc/nginx/conf.d/default.conf:ro
+      - frontend-dist:/usr/share/nginx/html:ro
     depends_on:
       - frontend
       - backend
@@ -96,6 +99,7 @@ volumes:
   pgdata:
   certbot-etc:
   certbot-var:
+  frontend-dist:
 
 networks:
   app-network:
