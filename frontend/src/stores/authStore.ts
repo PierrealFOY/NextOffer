@@ -43,7 +43,6 @@ export const useAuthStore = defineStore('authStore', {
           const response = await axios.get(`${API_URL}/api/auth/users/me`)
           this.currentUser = response.data
           this.isLoggedIn = true
-          console.log('User initialized from stored token:', response.data)
         } catch (error) {
           console.error('Failed to initialize auth with stored token:', error)
           this.logout()

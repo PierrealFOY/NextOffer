@@ -12,6 +12,7 @@ import ForgotPassword from '../auth/ForgotPassword.vue'
 import ResetPassword from '../auth/ResetPassword.vue'
 import MyJobsView from '../jobs/MyJobsView.vue'
 import About from '@/pages/About.vue'
+import JobView from '@/jobs/JobView.vue'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -52,7 +53,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/offers',
-    component: JobListVue,
+    component: JobView,
     props: true,
   },
   {

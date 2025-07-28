@@ -142,7 +142,7 @@ async def get_liked_jobs(user_id: int, db: Session = Depends(get_db)):
     return jobs
 
 ## SEEN JOBS ##
-@router.post("/{userId}/seen-jobs", response_model = UserResponse)
+@router.post("/{user_id}/seen-jobs", response_model = UserResponse)
 async def see_job(
     payload: FavoriteJobRequest,
     current_user=Depends(get_current_user),

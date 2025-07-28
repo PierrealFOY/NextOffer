@@ -77,8 +77,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:liked', jobId: string): void
-  (e: 'update:seen', jobId: string): void
   (e: 'select', job: Job): void
 }>()
 
@@ -95,16 +93,15 @@ const handletoggleLikeJob = async () => {
   }
 
   await jobStore.toggleLikeWithFeedback(props.job.id)
-  emit('update:liked', props.job.id)
 }
 
-const jobSeen = (jobId: string) => {
+const jobSeen = async (jobId: string) => {
+  await jobStore.seeJob(jobId)
   if (props.job.url) {
     window.open(props.job.url, '_blank')
   } else {
     goToJobDetails(props.job)
   }
-  emit('update:seen', props.job.id)
 }
 
 const dateCreationFormatted = computed(() => {
