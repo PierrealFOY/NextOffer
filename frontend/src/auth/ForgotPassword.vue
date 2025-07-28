@@ -50,6 +50,8 @@ import { useForm } from 'vee-validate'
 import { ref } from 'vue'
 import z from 'zod'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const { toast } = useToast()
 
 const isSubmitting = ref(false)
@@ -72,7 +74,7 @@ const onSubmit = form.handleSubmit(async (values) => {
   submitError.value = null
 
   try {
-    const response = await fetch('http://localhost:8000/api/auth/forgot-password', {
+    const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

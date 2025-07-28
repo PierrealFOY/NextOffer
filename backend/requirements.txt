@@ -14,4 +14,3 @@ SQLAlchemy
 psycopg2-binary
 alembic
 bandit
-starlette>=0.22.0
