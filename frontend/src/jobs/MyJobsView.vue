@@ -4,7 +4,6 @@
 
     <div class="mb-4 flex space-x-4 border-b">
       <RouterLink
-        :jobs="likedJobs"
         to="/myJobs/liked"
         class="pb-2 text-accentPrimary dark:text-mintGreen"
         :class="{
@@ -15,7 +14,6 @@
         Likées
       </RouterLink>
       <RouterLink
-        :jobs="seenJobs"
         to="/myJobs/seen"
         class="pb-2 text-accentPrimary dark:text-mintGreen"
         :class="{
@@ -42,26 +40,14 @@
 </template>
 
 <script setup lang="ts">
-defineOptions({
-  inheritAttrs: false,
-})
-
-import { onMounted, computed } from 'vue'
+import { onMounted } from 'vue'
 import { useJobStore } from '../stores/jobStore'
 import { useSidebar } from '@/components/ui/sidebar'
 
-const emit = defineEmits<{
-  (e: 'update:liked', jobId: string): void
-  (e: 'update:seen', jobId: string): void
-}>()
-
 const store = useJobStore()
+const { open } = useSidebar()
 
 onMounted(() => {
   if (store.jobs.length === 0) store.fetchJobs()
 })
-
-const likedJobs = computed(() => store.likedJobs)
-const seenJobs = computed(() => store.likedJobs)
-const { open } = useSidebar()
 </script>
