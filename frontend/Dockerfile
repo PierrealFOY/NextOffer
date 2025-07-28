@@ -11,7 +11,7 @@ COPY . .
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
-RUN echo "VITE_API_URL=$VITE_API_URL" > .env.production
+RUN VITE_API_URL=$VITE_API_URL npm run build
 RUN npm run build
 
 # 👇 only static files
