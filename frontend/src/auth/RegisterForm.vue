@@ -10,6 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const formSchema = toTypedSchema(
   z
     .object({
@@ -49,7 +51,7 @@ const onSubmit = form.handleSubmit(async (values) => {
   isLoading.value = true
 
   try {
-    await axios.post('http://localhost:8000/api/auth/register', {
+    await axios.post(`${API_URL}/api/auth/register`, {
       username: values.username,
       email: values.email,
       password: values.password,

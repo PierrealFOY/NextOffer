@@ -73,7 +73,7 @@ export const useJobStore = defineStore('jobStore', {
     async fetchJobs(offset: number = 0, limit: number = 20) {
       this.isLoading = true
       try {
-        const res = await fetch(`${API_URL}/api/jobs?offset=${offset}&limit=${limit}`)
+        const res = await fetch(`${API_URL}/api/jobs/?offset=${offset}&limit=${limit}`)
 
         if (!res.ok) {
           const errorText = await res.text()
