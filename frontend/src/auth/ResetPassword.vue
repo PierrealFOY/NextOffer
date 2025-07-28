@@ -59,6 +59,8 @@ const token = route.query.token as string;
 const submitSuccess = ref(false);
 const submitError = ref<string | null>(null);
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const formSchema = toTypedSchema(
   z.object({
     new_password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
@@ -74,7 +76,7 @@ const onSubmit = form.handleSubmit(async (values) => {
   submitSuccess.value = false;
 
   try {
-    const res = await fetch('http://localhost:8000/auth/reset-password', {
+    const res = await fetch(`${API_URL}/auth/reset-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
