@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
-
+from starlette.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from core.config import Settings, settings
 
@@ -31,6 +31,7 @@ app.add_middleware(
 )
 
 app.add_middleware(HTTPSRedirectMiddleware)
+app.add_middleware(ProxyHeadersMiddleware)
 
 @app.on_event("startup")
 def on_startup():
