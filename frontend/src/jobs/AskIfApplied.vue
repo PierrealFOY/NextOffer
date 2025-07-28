@@ -10,7 +10,7 @@ const props = defineProps<{
 
 const store = useJobStore()
 const handleAppliedJobUpdate = (jobId: string) => {
-  store.updateAppliedJobs(jobId)
+  console.log(store.appliedJobs)
 }
 </script>
 
