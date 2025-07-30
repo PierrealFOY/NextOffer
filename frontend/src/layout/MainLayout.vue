@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, provide } from 'vue'
+import { ref, onMounted, onUnmounted, provide, watch } from 'vue'
 import { useJobStore } from '@/stores/jobStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useSidebar } from '@/components/ui/sidebar'
@@ -70,9 +70,6 @@ onMounted(() => {
 
 onMounted(async () => {
   await authStore.initializeAuth()
-  if (jobStore.jobs.length === 0 && !jobStore.isLoading) {
-    jobStore.fetchJobs()
-  }
 })
 
 onUnmounted(() => {
@@ -80,4 +77,21 @@ onUnmounted(() => {
     observer.unobserve(sentinelRef.value)
   }
 })
+
+watch(
+  () => authStore.currentUser?.id, // this is what we watch to check if a user changes
+  async (newUserId, oldUserId) => {
+    // refetch if user id has changed
+    if (newUserId !== oldUserId) {
+      console.log(`User changed from ${oldUserId} to ${newUserId}. Refreshing jobs and statuses...`)
+      jobStore.offset = 0
+      jobStore.hasMore = true
+      if (!jobStore.isLoading) {
+        await jobStore.fetchJobs()
+      }
+      await jobStore.clearAndFetchUserJobStatuses()
+    }
+  },
+  { immediate: true },
+)
 </script>

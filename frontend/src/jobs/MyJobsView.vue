@@ -48,6 +48,6 @@ const store = useJobStore()
 const { open } = useSidebar()
 
 onMounted(() => {
-  if (store.jobs.length === 0) store.fetchJobs()
+  if (store.jobs.length === 0 && !store.isLoading) store.fetchJobs()
 })
 </script>
