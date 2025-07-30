@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <h1 class="my-4">MES OFFRES LIKÉES</h1>
+    <h1 class="my-4">MES OFFRES LIKÉES: {{ store.likedJobs.length }}</h1>
     <JobList
       :enableInfiniteScroll="false"
       :isLoading="false"

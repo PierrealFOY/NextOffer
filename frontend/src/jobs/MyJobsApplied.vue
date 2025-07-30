@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <h1 class="my-4">MES CANDIDATURES ENVOYEES</h1>
+    <h1 class="my-4">MES CANDIDATURES ENVOYEES: {{ store.appliedJobs.length }}</h1>
     <JobList
       :enableInfiniteScroll="false"
       :isLoading="false"
