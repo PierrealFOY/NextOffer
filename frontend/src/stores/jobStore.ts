@@ -92,9 +92,6 @@ export const useJobStore = defineStore('jobStore', {
 
         this.jobs = offset === 0 ? jobsWithInitialStatus : [...this.jobs, ...jobsWithInitialStatus]
 
-        await this.fetchLikedJobs()
-        await this.fetchSeenJobs()
-
         if (data.length < limit) this.hasMore = false
       } catch (error) {
         console.error('Failed to fetch jobs:', error)
@@ -251,6 +248,9 @@ export const useJobStore = defineStore('jobStore', {
     },
     async fetchLikedJobs() {
       if (!this.currentUser?.id) {
+        this.jobs.forEach((job) => {
+          job.liked = false
+        })
         console.error('User ID is missing — cannot fetch liked jobs.')
         return
       }
@@ -316,6 +316,9 @@ export const useJobStore = defineStore('jobStore', {
     },
     async fetchSeenJobs() {
       if (!this.currentUser?.id) {
+        this.jobs.forEach((job) => {
+          job.seen = false
+        })
         console.error('User ID is missing — cannot fetch liked jobs.')
         return
       }
@@ -326,6 +329,21 @@ export const useJobStore = defineStore('jobStore', {
         job.seen = seenJobsData.some((seenJob) => seenJob.id === job.id)
       })
       console.log('Seen jobs status synchronized.')
+    },
+    async clearAndFetchUserJobStatuses() {
+      // first clear all job statuses
+      this.jobs.forEach((job) => {
+        job.liked = false
+        job.seen = false
+        job.applicationSent = false
+      })
+
+      // then fetch new user's statuses if logged in (based on the watcher in MainLayout)
+      if (this.currentUser?.id) {
+        await this.fetchLikedJobs()
+        await this.fetchSeenJobs()
+        // TODO manage applied jobs
+      }
     },
   },
 })
