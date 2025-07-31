@@ -48,16 +48,16 @@ const { isMobile, open } = useSidebar()
 const isHeaderVisible = inject('isHeaderVisible', ref(true))
 
 const containerClasses = computed(() => {
-  if (isMobile.value) return 'mt-6 w-[85vw] mx-4'
+  if (isMobile.value) return 'mt-6 w-[90vw] justify-center -mx-1'
   if (isFullScreen.value) {
-    return open.value ? 'mt-10 w-[85vw]' : 'mt-10 w-[85vw] pb-10 overflow-y-auto overflow-x-hidden'
+    return open.value ? 'mt-10 w-[90vw]' : 'mt-10 w-[85vw] pb-10 overflow-y-auto overflow-x-hidden'
   }
   return isHeaderVisible.value ? 'top-16 mt-16 h-[68%]' : 'top-2 mt-0 h-[85vh]'
 })
 
 const cardWidthClass = computed(() => {
-  if (isFullScreen.value) return open.value ? 'w-[80%] self-center' : 'w-[90%]'
-  return open.value ? 'w-[90%]' : 'w-[95%]'
+  if (isFullScreen.value) return open.value ? 'w-[85%] h-[90%] ' : 'w-[90%]'
+  return open.value ? 'w-[95%]' : 'w-[95%]'
 })
 
 const descriptionHeightClass = computed(() => {
@@ -67,10 +67,13 @@ const descriptionHeightClass = computed(() => {
 </script>
 
 <template>
-  <div class="flex transition-all duration-300 ease-in-out" :class="containerClasses">
+  <div
+    class="mb-4 flex w-full transition-all duration-300 ease-in-out md:justify-center"
+    :class="containerClasses"
+  >
     <div
       :class="cardWidthClass"
-      class="flex flex-col space-y-4 rounded-lg border border-accentPrimary bg-baseMedium p-6 shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
+      class="flex h-fit flex-col space-y-4 rounded-lg border border-accentPrimary bg-baseMedium p-6 shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
     >
       <header :class="{ 'justify-end': !isFullScreen }" class="flex w-full">
         <Button
