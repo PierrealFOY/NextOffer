@@ -3,11 +3,16 @@
     <SkeletonJobs />
   </div>
 
-  <div class="mt-2 flex h-[calc(100vh-80px)] w-full gap-4 pt-4">
+  <div class="mt-2 flex h-[calc(100vh-80px)] w-full pt-4">
+    <!-- Job Card container -->
     <div
       :class="{
         'w-[80%]': !selectedJob && !isMobile,
+        'w-[50%]': selectedJob && !isMobile,
         'w-full': isMobile,
+        'w-3/4': open && !selectedJob,
+        'w-[33%]': !open && selectedJob && !isMobile,
+        'w-[30%]': open && selectedJob && !isMobile,
       }"
       class="flex flex-col transition-all duration-300 ease-in-out"
     >
@@ -17,7 +22,6 @@
             'rounded-sm border-2 border-accentPrimary dark:border-mintGreen':
               job.id === selectedJob?.id,
             'mx-1': isMobile,
-            'w-3/4': open,
           }"
           class="m-4 mb-4 w-full max-w-full transition-all duration-300 ease-in-out hover:scale-[102%]"
         >
@@ -52,11 +56,16 @@
       </div>
     </div>
 
+    <!-- JobDetails -->
     <div
       v-if="selectedJob && !isMobile"
-      :class="[open ? 'w-[100%]' : 'w-[60%]', 'transition-all duration-300', 'mt-2']"
+      class="mt-2 flex flex-col transition-all duration-300 ease-in-out"
     >
       <JobDetails
+        :class="{
+          'w-[61%]': !open,
+          'w-[55%]': open,
+        }"
         class="fixed"
         :job="selectedJob"
         @close="selectedJob = null"
