@@ -302,9 +302,9 @@ onMounted(() => {
       </Button>
     </SidebarHeader>
 
-    <SidebarContent class="flex-1 overflow-y-auto" :class="{ 'px-4': open, 'p-3': !open }">
+    <SidebarContent class="flex-1 overflow-y-auto" :class="{ 'p-3': !open }">
       <SidebarGroup>
-        <ul class="space-y-2">
+        <ul class="justify-start space-y-2">
           <li v-for="item in pages.main" :key="item.to">
             <RouterLink
               :to="item.to"
@@ -398,8 +398,8 @@ onMounted(() => {
       </SidebarGroup>
     </SidebarContent>
 
-    <SidebarFooter class="flex h-full flex-col p-4" :class="{ 'flex-col items-center': !open }">
-      <div v-if="open" class="flex w-full flex-col justify-end space-y-2">
+    <SidebarFooter class="flex h-full flex-col">
+      <div v-if="open" class="flex h-full w-full flex-col justify-center space-y-2">
         <template v-if="isLoggedIn && user !== null">
           <NavUser :user="user" />
           <a
@@ -429,7 +429,7 @@ onMounted(() => {
           </RouterLink>
         </template>
       </div>
-      <template v-else>
+      <div class="flex h-full flex-col justify-center" v-else>
         <template v-if="isLoggedIn">
           <a
             @click="authStore.logout()"
@@ -455,7 +455,7 @@ onMounted(() => {
             <HousePlus class="h-5 w-5" />
           </RouterLink>
         </template>
-      </template>
+      </div>
     </SidebarFooter>
   </Sidebar>
 </template>
