@@ -1,13 +1,22 @@
 <template>
-  <div class="account-page max-3/4 mx-auto rounded-md py-10 px-4 dark:bg-neutral-800">
-    <h1 class="text-3xl font-semibold mb-6">Mon compte</h1>
+  <div
+    :class="{ 'w-[62%]': !isMobile, 'h-1/2 w-full': isMobile }"
+    class="mx-auto my-10 flex flex-col rounded-md border border-accentPrimary bg-gray-200 px-4 py-10 shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
+  >
+    <h1 :class="{ 'text-3xl': !isMobile, 'text-xl': isMobile }" class="mb-6 font-semibold">
+      Mon compte
+    </h1>
 
-    <div v-if="isLoggedIn && currentUser" class=" shadow-md rounded-lg p-6">
-      <p class="text-lg"><strong>Nom d'utilisateur :</strong> {{ currentUser.username }}</p>
-      <p class="text-lg"><strong>Email :</strong> {{ currentUser.email }}</p>
+    <div
+      v-if="isLoggedIn && currentUser"
+      :class="{ 'text-lg': !isMobile }"
+      class="rounded-lg p-6 shadow-md"
+    >
+      <p><strong>Nom d'utilisateur :</strong> {{ currentUser.username }}</p>
+      <p><strong>Email :</strong> {{ currentUser.email }}</p>
 
       <div class="mt-6">
-        <button @click="logout" class="bg-red-500 hover:bg-red-600 font-semibold px-4 py-2 rounded">
+        <button @click="logout" class="rounded bg-red-500 px-4 py-2 font-semibold hover:bg-red-600">
           Se déconnecter
         </button>
       </div>
@@ -20,8 +29,11 @@
 </template>
 
 <script setup lang="ts">
+import { useSidebar } from '@/components/ui/sidebar'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
+
+const { isMobile } = useSidebar()
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -33,4 +45,3 @@ const logout = () => {
   router.push('/login')
 }
 </script>
-

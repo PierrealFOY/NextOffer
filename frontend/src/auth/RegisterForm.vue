@@ -81,10 +81,13 @@ const { isMobile } = useSidebar()
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center pb-16 pt-16">
+  <div
+    :class="{ 'mt-20': isMobile }"
+    class="flex min-h-screen items-center justify-center pb-16 landscape:mt-40"
+  >
     <Card
-      :class="{ 'h-3/4 w-[100%]': isMobile, 'h-3/ w-1/2': !isMobile }"
-      class="border border-accentPrimary shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
+      :class="{ 'mx-2 mb-20 mt-16 w-[100%]': isMobile, 'w-2/3': !isMobile }"
+      class="h-fit border border-accentPrimary shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
     >
       <CardHeader>
         <CardTitle class="text-center text-2xl font-bold">Inscription</CardTitle>
