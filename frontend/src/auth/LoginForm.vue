@@ -91,10 +91,10 @@ const { isMobile } = useSidebar()
 </script>
 
 <template>
-  <div class="-mt-8 flex min-h-screen w-full items-center justify-center">
+  <div class="mt-16 flex min-h-screen justify-center">
     <Card
-      :class="{ 'h-3/4 w-[100%]': isMobile, 'h-2/3 w-1/2': !isMobile }"
-      class="border border-accentPrimary shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
+      :class="{ 'mx-2 w-[100%]': isMobile, 'w-2/3': !isMobile }"
+      class="h-fit border border-accentPrimary shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
     >
       <CardHeader>
         <CardTitle class="text-center text-2xl font-bold">Connexion</CardTitle>

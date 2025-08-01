@@ -1,17 +1,9 @@
 <template>
-  <SidebarProvider v-slot="{ open, isMobile, openMobile }">
+  <SidebarProvider>
     <div class="flex h-screen w-screen transition-all duration-300">
       <Toaster />
-
-      <SidebarWrapper
-        :class="{ 'w-64': open, 'w-16': !open, hidden: isMobile && !openMobile }"
-        class="fixed left-0 top-0 z-30 h-full transition-all duration-300"
-      />
-
-      <MainLayout
-        :class="{ 'p-2': isMobile && !openMobile }"
-        class="flex-1 transition-all duration-300"
-      />
+      <SidebarWrapper class="fixed left-0 top-0 z-30 h-full" />
+      <MainLayout class="flex-1 transition-all duration-300" />
     </div>
   </SidebarProvider>
 </template>
