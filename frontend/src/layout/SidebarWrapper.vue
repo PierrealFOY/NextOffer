@@ -6,9 +6,10 @@
         // Desktop
         'w-56 md:block': !isMobileDevice && !isTabletDevice && open,
         'w-16 md:block': !isMobileDevice && !isTabletDevice && !open,
-        // Mobile & Tablet
+        // Mobile
         'w-56': isMobileDevice && openMobile && !isLandscape,
-        'w-64': isTabletDevice && openMobile && !isLandscape,
+        // Tablet
+        'w-56': isTabletDevice && openTablet && !isLandscape,
         hidden: (isMobileDevice || isTabletDevice) && !openMobile,
       }"
       :open="open"
@@ -29,7 +30,7 @@ import SidebarApp from '@/layout/SidebarApp.vue'
 import { useDeviceDetection } from '@/utils/useDeviceDetection'
 
 const sidebarAppRef = ref()
-const { open, openMobile, setOpen, setOpenMobile } = useSidebar()
+const { open, openMobile, setOpen, setOpenMobile, openTablet, setOpenTablet } = useSidebar()
 const { isMobileDevice, isTabletDevice, isLandscape } = useDeviceDetection()
 console.log('openMobile', openMobile.value)
 
@@ -39,9 +40,11 @@ watch(
     if (newIsMobile || newIsTablet) {
       setOpen(false)
       setOpenMobile(false)
+      setOpenTablet(false)
     } else {
       setOpen(true)
       setOpenMobile(false)
+      setOpenTablet(false)
     }
   },
   { immediate: true },

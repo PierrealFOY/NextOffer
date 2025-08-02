@@ -2,15 +2,16 @@
   <main class="flex min-h-screen w-full items-stretch overflow-x-hidden text-foreground">
     <div class="flex w-full flex-col p-4 transition-all duration-300">
       <div
-        v-if="!openMobile && (isMobileDevice || isTabletDevice)"
+        v-if="!openMobile || !openTablet || !isDesktopDevice"
         :class="{
           'fixed top-6 z-50 h-12 w-10 rounded-xl bg-background/70 shadow-md backdrop-blur-md transition duration-300': true,
           'left-4': isLandscape,
           'left-2': !isLandscape,
+          hidden: isDesktopDevice || openTablet,
         }"
       >
         <Button
-          @click="openSidebarMobile"
+          @click="openSidebarMobileOrTablet"
           variant="ghost"
           size="icon"
           class="h-full w-full text-foreground"
@@ -19,7 +20,7 @@
         </Button>
       </div>
 
-      <SidebarWrapper />
+      <!-- <SidebarWrapper /> -->
 
       <TerminalHeader class="w-4/5" @search="handleSearch" />
       <span ref="sentinelRef" class="h-[1px] w-full"></span>
@@ -42,7 +43,6 @@ import { useAuthStore } from '@/stores/authStore'
 import { useSidebar } from '@/components/ui/sidebar'
 import TerminalHeader from '../layout/TerminalHeader.vue'
 import ToggleMode from '../layout/ToggleMode.vue'
-import SidebarWrapper from '@/layout/SidebarWrapper.vue' // Importez le wrapper ici
 import { Menu } from 'lucide-vue-next'
 import { useDeviceDetection } from '@/utils/useDeviceDetection'
 
@@ -53,10 +53,16 @@ const jobStore = useJobStore()
 const handleSearch = (query: string) => jobStore.setSearchQuery(query)
 
 // Sidebar mobile
-const { setOpenMobile, openMobile } = useSidebar()
-const openSidebarMobile = () => setOpenMobile(true)
+const { setOpenMobile, openMobile, openTablet, setOpenTablet } = useSidebar()
+const openSidebarMobileOrTablet = () => {
+  if (isMobileDevice) {
+    setOpenMobile(true)
+  } else if (isTabletDevice) {
+  }
+  setOpenTablet(true)
+}
 
-const { isMobileDevice, isLandscape, isTabletDevice } = useDeviceDetection()
+const { isMobileDevice, isLandscape, isTabletDevice, isDesktopDevice } = useDeviceDetection()
 
 // IntersectionObserver
 const isHeaderVisible = ref(true)
