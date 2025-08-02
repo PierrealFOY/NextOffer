@@ -117,7 +117,7 @@ const props = defineProps({
   },
 })
 
-const { setOpenMobile, setOpen } = useSidebar()
+const { setOpenMobile, setOpen, setOpenTablet } = useSidebar()
 
 console.log('isMobileDevice', props.isMobileDevice)
 console.log('isTabletDevice', props.isTabletDevice)
@@ -127,11 +127,15 @@ console.log('openMobile', props.openMobile)
 defineEmits(['toggle'])
 const closeSidebar = () => {
   setOpenMobile(false)
+  setOpenTablet(false)
   setOpen(false)
 }
 
 const openSidebarMobileFromParent = () => {
-  if (props.isMobileDevice) setOpenMobile(true)
+  if (props.isMobileDevice || props.isTabletDevice) {
+    setOpenMobile(true)
+    setOpenTablet(true)
+  }
 }
 
 defineExpose({
@@ -139,8 +143,9 @@ defineExpose({
 })
 
 onMounted(() => {
-  if (props.isMobileDevice) {
+  if (props.isMobileDevice || props.isTabletDevice) {
     setOpenMobile(false)
+    setOpenTablet(false)
   }
 })
 </script>

@@ -11,6 +11,7 @@ import {
   SIDEBAR_WIDTH,
   SIDEBAR_WIDTH_ICON,
 } from './utils'
+import { useDeviceDetection } from '@/utils/useDeviceDetection'
 
 const props = withDefaults(
   defineProps<{
@@ -31,6 +32,9 @@ const emits = defineEmits<{
 const isMobile = useMediaQuery('(max-width: 768px)')
 const openMobile = ref(false)
 
+const { isTabletDevice } = useDeviceDetection()
+const openTablet = ref(false)
+
 const open = useVModel(props, 'open', emits, {
   defaultValue: props.defaultOpen ?? false,
   passive: (props.open === undefined) as false,
@@ -45,6 +49,10 @@ function setOpen(value: boolean) {
 
 function setOpenMobile(value: boolean) {
   openMobile.value = value
+}
+
+const setOpenTablet = (value: boolean) => {
+  openTablet.value = value
 }
 
 // Helper to toggle the sidebar.
@@ -70,6 +78,8 @@ provideSidebarContext({
   isMobile,
   openMobile,
   setOpenMobile,
+  openTablet,
+  setOpenTablet,
   toggleSidebar,
 })
 </script>
@@ -91,8 +101,10 @@ provideSidebarContext({
     >
       <slot
         :isMobile="isMobile"
+        :isTablet="isTabletDevice"
         :open="open"
         :openMobile="openMobile"
+        :openTablet="openTablet"
         @toggleSidebar="toggleSidebar"
       />
     </div>
