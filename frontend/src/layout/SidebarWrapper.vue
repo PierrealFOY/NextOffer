@@ -1,21 +1,20 @@
 <template>
   <div class="relative">
     <SidebarApp
-      v-if="!isMobile"
-      class="fixed left-0 top-0 z-40 min-h-screen shrink-0 md:block"
-      :class="{ 'w-56': open, 'w-16': !open }"
+      class="fixed left-0 top-0 z-40 min-h-screen shrink-0"
+      :class="{
+        // Desktop
+        'w-56 md:block': !isMobileDevice && !isTabletDevice && open,
+        'w-16 md:block': !isMobileDevice && !isTabletDevice && !open,
+        // Mobile & tablet
+        'w-56': (isMobileDevice || isTabletDevice) && openMobile,
+        hidden: (isMobileDevice || isTabletDevice) && !openMobile,
+      }"
       :open="open"
       :open-mobile="openMobile"
-      ref="sidebarAppRef"
-      @toggle="toggleSidebar"
-    />
-
-    <SidebarApp
-      v-if="isMobile"
-      :class="{ 'hidden w-0': !openMobile, 'w-64': openMobile }"
-      class="fixed inset-y-0 left-0 z-40 h-full overflow-y-auto md:hidden"
-      :open="open"
-      :open-mobile="openMobile"
+      :is-mobile-device="isMobileDevice"
+      :is-tablet-device="isTabletDevice"
+      :is-landscape="isLandscape"
       ref="sidebarAppRef"
       @toggle="toggleSidebar"
     />
@@ -23,24 +22,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { useSidebar } from '@/components/ui/sidebar'
 import SidebarApp from '@/layout/SidebarApp.vue'
+import { useDeviceDetection } from '@/utils/useDeviceDetection'
 
 const sidebarAppRef = ref()
-const { open, openMobile, setOpen, setOpenMobile, isMobile } = useSidebar()
+const { open, openMobile, setOpen, setOpenMobile } = useSidebar()
+const { isMobileDevice, isTabletDevice, isLandscape } = useDeviceDetection()
 
-onMounted(() => {
-  if (isMobile.value) {
-    setOpen(false)
-  } else {
-    setOpenMobile(false)
-  }
-  openMobile.value = false
-})
+watch(
+  [isMobileDevice, isTabletDevice],
+  ([newIsMobile, newIsTablet]) => {
+    if (newIsMobile || newIsTablet) {
+      setOpen(false)
+      setOpenMobile(false)
+    } else {
+      setOpen(true)
+      setOpenMobile(false)
+    }
+  },
+  { immediate: true },
+)
 
 const toggleSidebar = () => {
-  if (isMobile.value) {
+  if (isMobileDevice.value || isTabletDevice.value) {
     setOpenMobile(!openMobile.value)
     setOpen(false)
   } else {

@@ -8,11 +8,12 @@
     <div
       :class="{
         'w-[80%]': !selectedJob && !isMobile,
-        'w-[50%]': selectedJob && !isMobile,
-        'w-full': isMobile,
+        'w-[30%]': selectedJob && (isDesktopDevice || isTabletDevice),
+        'w-1/3': (selectedJob && openMobile && isTabletDevice) || (isTabletDevice && !isLandscape),
+        'w-[90%]': (isMobile || isTabletDevice) && !isLandscape && !selectedJob,
         'w-3/4': open && !selectedJob,
         'w-[33%]': !open && selectedJob && !isMobile,
-        'w-[30%]': open && selectedJob && !isMobile,
+        'w-[36%]': open && selectedJob && isDesktopDevice,
       }"
       class="flex flex-col transition-all duration-300 ease-in-out"
     >
@@ -58,13 +59,13 @@
 
     <!-- JobDetails -->
     <div
-      v-if="selectedJob && !isMobile"
+      v-if="selectedJob && isDesktopDevice"
       class="mt-2 flex flex-col transition-all duration-300 ease-in-out"
     >
       <JobDetails
         :class="{
-          'w-[61%]': !open,
-          'w-[55%]': open,
+          'w-[55%]': !open,
+          'w-[50%]': open,
         }"
         class="fixed"
         :job="selectedJob"
@@ -73,7 +74,14 @@
       />
     </div>
 
-    <div v-else-if="selectedJob && isMobile" class="right-4 top-16 mt-2 w-1/2 justify-end pl-2">
+    <div
+      v-else-if="selectedJob && (isMobile || isTabletDevice)"
+      class="right-4 top-16 mt-2 justify-end pl-2"
+      :class="{
+        hidden: !openMobile && (isMobile || isTabletDevice) && !isLandscape,
+        'w-2/3': !openMobile && (isMobile || isTabletDevice) && isLandscape,
+      }"
+    >
       <JobDetails
         :fullScreen="true"
         class="space-y-0"
@@ -96,6 +104,7 @@ import JobDetails from './JobDetails.vue'
 import { Button } from '@/components/ui/button'
 import { nextTick } from 'vue'
 import { useSidebar } from '@/components/ui/sidebar'
+import { useDeviceDetection } from '@/utils/useDeviceDetection'
 
 const props = withDefaults(
   defineProps<{
@@ -113,7 +122,8 @@ const props = withDefaults(
 const store = useJobStore()
 const selectedJob = ref<Job | null>(null)
 const loadMoreTrigger = ref<HTMLElement | null>(null)
-const { isMobile, open } = useSidebar()
+const { isMobile, open, openMobile, isLandscape } = useSidebar()
+const { isTabletDevice, isDesktopDevice } = useDeviceDetection()
 
 const handleSelectJob = (job: Job) => {
   if (props.allowCardDetails) selectedJob.value = job

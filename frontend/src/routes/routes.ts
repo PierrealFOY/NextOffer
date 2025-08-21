@@ -54,6 +54,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/offers',
     component: JobView,
+    name: 'jobview',
     props: true,
   },
   {

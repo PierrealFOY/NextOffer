@@ -25,7 +25,7 @@ import {
   Save,
   Send,
 } from 'lucide-vue-next'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import NavUser from './NavUser.vue'
 import ToggleMode from './ToggleMode.vue'
@@ -103,6 +103,18 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  isMobileDevice: {
+    type: Boolean,
+    required: true,
+  },
+  isLandscape: {
+    type: Boolean,
+    required: true,
+  },
+  isTabletDevice: {
+    type: Boolean,
+    required: true,
+  },
 })
 
 const { setOpenMobile, setOpen, isMobile } = useSidebar()
@@ -114,26 +126,72 @@ const closeSidebar = () => {
 }
 
 const openSidebarMobileFromParent = () => {
-  if (isMobile.value) setOpenMobile(true)
+  if (props.isMobileDevice || props.isTabletDevice) {
+    setOpenMobile(true)
+  }
 }
 
 defineExpose({
   openSidebarMobileFromParent,
 })
 
+// Text animation logic
+const fullText = 'NextOffer'
+const displayedText = ref('')
+let animationTimeout: ReturnType<typeof setTimeout> | null = null
+
+const startTypingAnimation = () => {
+  let i = 0
+  displayedText.value = ''
+  if (animationTimeout) clearTimeout(animationTimeout)
+
+  const type = () => {
+    if (i < fullText.length) {
+      displayedText.value += fullText.charAt(i)
+      i++
+      if (isMobile || props.isTabletDevice) {
+        animationTimeout = setTimeout(type, 90)
+      } else {
+        animationTimeout = setTimeout(type, 65)
+      }
+    }
+  }
+  type()
+}
+
+const resetAnimation = () => {
+  if (animationTimeout) clearTimeout(animationTimeout)
+  displayedText.value = ''
+}
+
+watch(
+  () => props.open || props.openMobile,
+  (newVal) => {
+    if (newVal) {
+      startTypingAnimation()
+    } else {
+      resetAnimation()
+    }
+  },
+)
+
 onMounted(() => {
-  if (isMobile.value) {
+  if (props.isMobileDevice || props.isTabletDevice) {
     setOpenMobile(false)
   }
+  startTypingAnimation()
 })
 </script>
 
 <template>
   <!-- Mobile -->
   <Sidebar
-    v-if="isMobile && openMobile"
-    class="fixed inset-y-0 left-0 z-40 flex h-full w-64 transform flex-col border-r border-border bg-gray-300 text-accentPrimary shadow-xl transition-transform duration-300 ease-in-out dark:bg-neutral-800 dark:text-mintGreen"
-    :class="{ 'translate-x-0': openMobile, '-translate-x-full': !openMobile }"
+    v-if="isMobileDevice || isTabletDevice"
+    class="fixed inset-y-0 left-0 z-40 flex h-fit w-64 transform flex-col border-r border-border bg-gray-300 text-accentPrimary shadow-xl transition-transform duration-300 ease-in-out dark:bg-neutral-800 dark:text-mintGreen"
+    :class="{
+      'translate-x-0': openMobile,
+      '-translate-x-full': !openMobile,
+    }"
   >
     <SidebarHeader class="flex p-4">
       <div class="mb-4 flex justify-between space-x-2">
@@ -152,7 +210,7 @@ onMounted(() => {
             src="../assets/coffeeAccentPrimary.png"
             alt="icon"
           />
-          <p class="pt-2.5">NextOffer</p>
+          <p class="pt-2.5">{{ displayedText }}</p>
         </div>
         <Button @click="closeSidebar" variant="ghost" size="icon" class="flex text-foreground">
           <X class="h-5 w-5 text-accentPrimary dark:text-mintGreen" />
@@ -162,138 +220,156 @@ onMounted(() => {
         <ToggleMode />
       </div>
     </SidebarHeader>
-    <SidebarContent class="flex-1 overflow-y-auto">
-      <SidebarGroup>
-        <ul class="space-y-2">
-          <li v-for="item in pages.main" :key="item.to">
-            <RouterLink
-              :to="item.to"
-              @click="closeSidebar"
-              class="flex items-center space-x-3 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
-            >
-              <component :is="item.icon" class="h-5 w-5" />
-              <span
-                :class="{ 'text-green-800 underline dark:text-mintGreen': isLinkActive(item.to) }"
+    <div
+      :class="{ 'overflow-y-scroll': isLandscape && isMobileDevice }"
+      class="flex h-fit flex-col items-baseline gap-y-10 overflow-y-auto"
+    >
+      <SidebarContent class="flex-1 overflow-y-visible">
+        <SidebarGroup>
+          <ul class="space-y-2">
+            <li v-for="item in pages.main" :key="item.to">
+              <RouterLink
+                :to="item.to"
+                @click="closeSidebar"
+                class="flex items-center space-x-3 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
               >
-                {{ item.title }}
-              </span>
-            </RouterLink>
-          </li>
-          <li v-for="(group, groupIndex) in pages.myJobs" :key="`job-group-mobile-${groupIndex}`">
-            <Collapsible v-model="openCollapsible" class="space-y-1">
-              <CollapsibleTrigger as-child>
-                <Button
-                  variant="ghost"
-                  class="flex w-full items-center justify-between px-4 py-2 text-left"
-                  @click="handleCollapsibleToggle('my-jobs-group-mobile')"
+                <component :is="item.icon" class="h-5 w-5" />
+                <span
+                  :class="{ 'text-green-800 underline dark:text-mintGreen': isLinkActive(item.to) }"
                 >
-                  <div class="flex items-center space-x-3">
-                    <component :is="group.icon" class="h-5 w-5" />
-                    <span
-                      :class="{
-                        'text-green-800 underline dark:text-mintGreen': isCollapsibleGroupActive(
-                          group.items,
-                        ),
-                      }"
-                    >
-                      {{ group.title }}
-                    </span>
-                  </div>
-                  <ChevronDown
-                    :class="{ 'rotate-180': openCollapsible === 'my-jobs-group-mobile' }"
-                    class="h-4 w-4 transition-transform duration-200"
-                  />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent class="ml-4 mt-1 space-y-1">
-                <ul class="space-y-1">
-                  <li
-                    v-for="(subItem, subIndex) in group.items"
-                    :key="`my-jobs-sub-mobile-${subIndex}`"
+                  {{ item.title }}
+                </span>
+              </RouterLink>
+            </li>
+            <li v-for="(group, groupIndex) in pages.myJobs" :key="`job-group-mobile-${groupIndex}`">
+              <Collapsible v-model="openCollapsible" class="space-y-1">
+                <CollapsibleTrigger as-child>
+                  <Button
+                    variant="ghost"
+                    class="flex w-full items-center justify-between px-4 py-2 text-left"
+                    @click="handleCollapsibleToggle('my-jobs-group-mobile')"
                   >
-                    <RouterLink
-                      :to="subItem.to"
-                      @click="closeSidebar"
-                      class="flex items-center space-x-2 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
-                      :class="{
-                        'text-green-800 underline dark:text-mintGreen': isLinkActive(subItem.to),
-                      }"
+                    <div class="flex items-center space-x-3">
+                      <component :is="group.icon" class="h-5 w-5" />
+                      <span
+                        :class="{
+                          'text-green-800 underline dark:text-mintGreen': isCollapsibleGroupActive(
+                            group.items,
+                          ),
+                        }"
+                      >
+                        {{ group.title }}
+                      </span>
+                    </div>
+                    <ChevronDown
+                      :class="{ 'rotate-180': openCollapsible === 'my-jobs-group-mobile' }"
+                      class="h-4 w-4 transition-transform duration-200"
+                    />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent class="ml-4 mt-1 space-y-1">
+                  <ul class="space-y-1">
+                    <li
+                      v-for="(subItem, subIndex) in group.items"
+                      :key="`my-jobs-sub-mobile-${subIndex}`"
                     >
-                      <component :is="subItem.icon" class="h-5 w-5" v-if="subItem.icon" />
-                      <span>{{ subItem.title }}</span>
-                    </RouterLink>
-                  </li>
-                </ul>
-              </CollapsibleContent>
-            </Collapsible>
-          </li>
-          <li v-for="item in pages.offers" :key="item.to + '-mobile'">
+                      <RouterLink
+                        :to="subItem.to"
+                        @click="closeSidebar"
+                        class="flex items-center space-x-2 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
+                        :class="{
+                          'text-green-800 underline dark:text-mintGreen': isLinkActive(subItem.to),
+                        }"
+                      >
+                        <component :is="subItem.icon" class="h-5 w-5" v-if="subItem.icon" />
+                        <span>{{ subItem.title }}</span>
+                      </RouterLink>
+                    </li>
+                  </ul>
+                </CollapsibleContent>
+              </Collapsible>
+            </li>
+            <li v-for="item in pages.offers" :key="item.to + '-mobile'">
+              <RouterLink
+                :to="item.to"
+                @click="closeSidebar"
+                class="flex items-center space-x-3 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
+              >
+                <component :is="item.icon" class="h-5 w-5" />
+                <span
+                  :class="{ 'text-green-800 underline dark:text-mintGreen': isLinkActive(item.to) }"
+                >
+                  {{ item.title }}
+                </span>
+              </RouterLink>
+            </li>
+          </ul>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter class="p-1">
+        <div class="flex flex-col">
+          <template v-if="isLoggedIn && user !== null">
+            <NavUser :user="user" />
+            <a
+              @click="`authStore.logout(); closeSidebar()`"
+              class="flex cursor-pointer items-center space-x-3 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
+            >
+              <LogOut class="h-5 w-5" />
+              <span>Déconnexion</span>
+            </a>
+          </template>
+          <template v-else>
             <RouterLink
-              :to="item.to"
+              to="/login"
               @click="closeSidebar"
               class="flex items-center space-x-3 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
+              :class="{ 'text-green-800 underline dark:text-mintGreen': isLinkActive('/login') }"
             >
-              <component :is="item.icon" class="h-5 w-5" />
-              <span
-                :class="{ 'text-green-800 underline dark:text-mintGreen': isLinkActive(item.to) }"
-              >
-                {{ item.title }}
-              </span>
+              <LogIn class="h-5 w-5" />
+              <span>Connexion</span>
             </RouterLink>
-          </li>
-        </ul>
-      </SidebarGroup>
-    </SidebarContent>
-    <SidebarFooter class="mt-auto p-4">
-      <div class="flex flex-col space-y-2">
-        <template v-if="isLoggedIn && user !== null">
-          <NavUser :user="user" />
-          <a
-            @click="`authStore.logout(); closeSidebar()`"
-            class="flex cursor-pointer items-center space-x-3 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
-          >
-            <LogOut class="h-5 w-5" />
-            <span>Déconnexion</span>
-          </a>
-        </template>
-        <template v-else>
-          <RouterLink
-            to="/login"
-            @click="closeSidebar"
-            class="flex items-center space-x-3 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
-            :class="{ 'text-green-800 underline dark:text-mintGreen': isLinkActive('/login') }"
-          >
-            <LogIn class="h-5 w-5" />
-            <span>Connexion</span>
-          </RouterLink>
-          <RouterLink
-            to="/register"
-            @click="closeSidebar"
-            class="flex items-center space-x-3 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
-            :class="{ 'text-green-800 underline dark:text-mintGreen': isLinkActive('/register') }"
-          >
-            <HousePlus class="h-5 w-5" />
-            <span>Inscription</span>
-          </RouterLink>
-        </template>
-      </div>
-    </SidebarFooter>
+            <RouterLink
+              to="/register"
+              @click="closeSidebar"
+              class="flex items-center space-x-3 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
+              :class="{ 'text-green-800 underline dark:text-mintGreen': isLinkActive('/register') }"
+            >
+              <HousePlus class="h-5 w-5" />
+              <span>Inscription</span>
+            </RouterLink>
+          </template>
+        </div>
+      </SidebarFooter>
+    </div>
   </Sidebar>
 
   <!-- Desktop -->
   <Sidebar
     variant="sidebar"
     collapsible="none"
-    v-else-if="!isMobile"
+    v-else-if="!isMobileDevice && !isTabletDevice"
     class="sticky z-30 flex h-screen transform flex-col border-r border-border bg-baseMedium shadow-br-light transition-all duration-300 ease-in-out dark:bg-neutral-800 dark:shadow-br-dark"
   >
     <SidebarHeader
       class="flex items-center p-4"
-      :class="{ 'justify-end': open, 'justify-center': !open }"
+      :class="{ 'flex flex-row justify-between space-x-4': open, 'justify-start': !open }"
     >
+      <div
+        class="-ml-2 flex items-center space-x-2 text-lg font-bold text-accentPrimary transition-opacity duration-300 ease-in-out dark:ml-0 dark:text-mintGreen"
+        :class="{ 'opacity-0': !open }"
+      >
+        <img class="hidden dark:block" width="24" src="../assets/coffeeMintGreen.png" alt="icon" />
+        <img
+          class="block dark:hidden"
+          width="24"
+          src="../assets/coffeeAccentPrimary.png"
+          alt="icon"
+        />
+        <p class="pt-2.5">{{ displayedText }}</p>
+      </div>
       <Button
         @click="$emit('toggle')"
-        :class="{ 'self-end': open }"
+        :class="{ 'self-start': open, 'z-20 -mt-6': !open }"
         variant="ghost"
         size="icon"
         class="text-foreground"
@@ -302,7 +378,7 @@ onMounted(() => {
       </Button>
     </SidebarHeader>
 
-    <SidebarContent class="flex-1 overflow-y-auto" :class="{ 'p-3': !open }">
+    <SidebarContent class="flex-1 portrait:overflow-y-auto" :class="{ 'p-3': !open }">
       <SidebarGroup>
         <ul class="justify-start space-y-2">
           <li v-for="item in pages.main" :key="item.to">
