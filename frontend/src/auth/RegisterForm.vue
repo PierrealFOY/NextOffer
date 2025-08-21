@@ -81,10 +81,10 @@ const { isMobile } = useSidebar()
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center pb-16 pt-16">
+  <div class="flex min-h-screen flex-col items-center justify-start pb-16">
     <Card
-      :class="{ 'h-3/4 w-[100%]': isMobile, 'h-3/ w-1/2': !isMobile }"
-      class="border border-accentPrimary shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
+      :class="{ '-ml-4 mb-20 mt-16 w-[95%]': isMobile, 'mt-20 w-2/3': !isMobile }"
+      class="h-fit border border-accentPrimary shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
     >
       <CardHeader>
         <CardTitle class="text-center text-2xl font-bold">Inscription</CardTitle>
@@ -97,7 +97,7 @@ const { isMobile } = useSidebar()
               <FormLabel>Nom d'utilisateur</FormLabel>
               <FormControl>
                 <Input
-                  class="dark:border-mintGreen"
+                  class="border-accentPrimary dark:border-mintGreen"
                   type="text"
                   placeholder="johndoe"
                   v-bind="componentField"
@@ -112,7 +112,7 @@ const { isMobile } = useSidebar()
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
-                  class="dark:border-mintGreen"
+                  class="border-accentPrimary dark:border-mintGreen"
                   type="email"
                   placeholder="john.doe@example.com"
                   v-bind="componentField"
@@ -127,7 +127,7 @@ const { isMobile } = useSidebar()
               <FormLabel>Mot de passe</FormLabel>
               <FormControl>
                 <Input
-                  class="dark:border-mintGreen"
+                  class="border-accentPrimary dark:border-mintGreen"
                   type="password"
                   placeholder="••••••••"
                   v-bind="componentField"
@@ -142,7 +142,7 @@ const { isMobile } = useSidebar()
               <FormLabel>Confirmer le mot de passe</FormLabel>
               <FormControl>
                 <Input
-                  class="dark:border-mintGreen"
+                  class="border-accentPrimary dark:border-mintGreen"
                   type="password"
                   placeholder="••••••••"
                   v-bind="componentField"
