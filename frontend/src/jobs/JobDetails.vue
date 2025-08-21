@@ -44,7 +44,6 @@ const goToJobDetailsPage = () => {
   }
 }
 const { isMobile, open } = useSidebar()
-
 const isHeaderVisible = inject('isHeaderVisible', ref(true))
 
 const containerClasses = computed(() => {
@@ -75,21 +74,21 @@ const descriptionHeightClass = computed(() => {
       :class="cardWidthClass"
       class="flex h-fit flex-col space-y-4 rounded-lg border border-accentPrimary bg-baseMedium p-6 shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
     >
-      <header :class="{ 'justify-end': !isFullScreen }" class="flex w-full">
+      <header class="flex w-full">
         <Button
           type="button"
-          class="sticky flex cursor-pointer justify-end bg-neutral-800 hover:bg-neutral-700"
+          class="ml-auto flex cursor-pointer bg-gray-300 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
           title="Cliquez pour agrandir"
-          v-if="!isFullScreen"
+          v-if="!isFullScreen || !isFullScreenRoute"
           @click="goToJobDetailsPage"
         >
           <Maximize2 class="transition hover:text-primary" :size="24" />
         </Button>
         <Button
           type="button"
-          class="bg-neutral-800 p-0 hover:bg-neutral-700"
+          class="justify-start bg-gray-300 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
           title="Cliquez pour revenir en arrière"
-          v-if="isFullScreen"
+          v-if="isFullScreen && isFullScreenRoute"
           @click="router.back()"
         >
           <ArrowLeft class="mb-1 scale-125 cursor-pointer transition" />

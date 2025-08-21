@@ -32,8 +32,7 @@ const emits = defineEmits<{
 const isMobile = useMediaQuery('(max-width: 768px)')
 const openMobile = ref(false)
 
-const { isTabletDevice } = useDeviceDetection()
-const openTablet = ref(false)
+const { isTabletDevice, isLandscape } = useDeviceDetection()
 
 const open = useVModel(props, 'open', emits, {
   defaultValue: props.defaultOpen ?? false,
@@ -51,13 +50,10 @@ function setOpenMobile(value: boolean) {
   openMobile.value = value
 }
 
-const setOpenTablet = (value: boolean) => {
-  openTablet.value = value
-}
-
-// Helper to toggle the sidebar.
 const toggleSidebar = () => {
-  return isMobile.value ? setOpenMobile(!openMobile.value) : setOpen(!open.value)
+  return isMobile.value || isTabletDevice.value
+    ? setOpenMobile(!openMobile.value)
+    : setOpen(!open.value)
 }
 
 useEventListener('keydown', (event: KeyboardEvent) => {
@@ -78,9 +74,8 @@ provideSidebarContext({
   isMobile,
   openMobile,
   setOpenMobile,
-  openTablet,
-  setOpenTablet,
   toggleSidebar,
+  isLandscape,
 })
 </script>
 
@@ -104,7 +99,7 @@ provideSidebarContext({
         :isTablet="isTabletDevice"
         :open="open"
         :openMobile="openMobile"
-        :openTablet="openTablet"
+        :is-landscape="isLandscape"
         @toggleSidebar="toggleSidebar"
       />
     </div>
