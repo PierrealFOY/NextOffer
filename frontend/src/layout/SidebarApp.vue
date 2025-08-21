@@ -25,7 +25,7 @@ import {
   Save,
   Send,
 } from 'lucide-vue-next'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import NavUser from './NavUser.vue'
 import ToggleMode from './ToggleMode.vue'
@@ -117,24 +117,17 @@ const props = defineProps({
   },
 })
 
-const { setOpenMobile, setOpen, setOpenTablet } = useSidebar()
-
-console.log('isMobileDevice', props.isMobileDevice)
-console.log('isTabletDevice', props.isTabletDevice)
-console.log('isLandscape', props.isLandscape)
-console.log('openMobile', props.openMobile)
+const { setOpenMobile, setOpen, isMobile } = useSidebar()
 
 defineEmits(['toggle'])
 const closeSidebar = () => {
   setOpenMobile(false)
-  setOpenTablet(false)
   setOpen(false)
 }
 
 const openSidebarMobileFromParent = () => {
   if (props.isMobileDevice || props.isTabletDevice) {
     setOpenMobile(true)
-    setOpenTablet(true)
   }
 }
 
@@ -142,18 +135,58 @@ defineExpose({
   openSidebarMobileFromParent,
 })
 
+// Text animation logic
+const fullText = 'NextOffer'
+const displayedText = ref('')
+let animationTimeout: ReturnType<typeof setTimeout> | null = null
+
+const startTypingAnimation = () => {
+  let i = 0
+  displayedText.value = ''
+  if (animationTimeout) clearTimeout(animationTimeout)
+
+  const type = () => {
+    if (i < fullText.length) {
+      displayedText.value += fullText.charAt(i)
+      i++
+      if (isMobile || props.isTabletDevice) {
+        animationTimeout = setTimeout(type, 90)
+      } else {
+        animationTimeout = setTimeout(type, 65)
+      }
+    }
+  }
+  type()
+}
+
+const resetAnimation = () => {
+  if (animationTimeout) clearTimeout(animationTimeout)
+  displayedText.value = ''
+}
+
+watch(
+  () => props.open || props.openMobile,
+  (newVal) => {
+    if (newVal) {
+      startTypingAnimation()
+    } else {
+      resetAnimation()
+    }
+  },
+)
+
 onMounted(() => {
   if (props.isMobileDevice || props.isTabletDevice) {
     setOpenMobile(false)
-    setOpenTablet(false)
   }
+  startTypingAnimation()
 })
 </script>
 
 <template>
   <!-- Mobile -->
   <Sidebar
-    v-if="(isMobileDevice || isTabletDevice) && openMobile"
+    v-if="isMobileDevice || isTabletDevice"
     class="fixed inset-y-0 left-0 z-40 flex h-fit w-64 transform flex-col border-r border-border bg-gray-300 text-accentPrimary shadow-xl transition-transform duration-300 ease-in-out dark:bg-neutral-800 dark:text-mintGreen"
     :class="{
       'translate-x-0': openMobile,
@@ -177,7 +210,7 @@ onMounted(() => {
             src="../assets/coffeeAccentPrimary.png"
             alt="icon"
           />
-          <p class="pt-2.5">NextOffer</p>
+          <p class="pt-2.5">{{ displayedText }}</p>
         </div>
         <Button @click="closeSidebar" variant="ghost" size="icon" class="flex text-foreground">
           <X class="h-5 w-5 text-accentPrimary dark:text-mintGreen" />
@@ -314,16 +347,29 @@ onMounted(() => {
   <Sidebar
     variant="sidebar"
     collapsible="none"
-    v-else-if="!isMobileDevice"
+    v-else-if="!isMobileDevice && !isTabletDevice"
     class="sticky z-30 flex h-screen transform flex-col border-r border-border bg-baseMedium shadow-br-light transition-all duration-300 ease-in-out dark:bg-neutral-800 dark:shadow-br-dark"
   >
     <SidebarHeader
       class="flex items-center p-4"
-      :class="{ 'justify-end': open, 'justify-center': !open }"
+      :class="{ 'flex flex-row justify-between space-x-4': open, 'justify-start': !open }"
     >
+      <div
+        class="-ml-2 flex items-center space-x-2 text-lg font-bold text-accentPrimary transition-opacity duration-300 ease-in-out dark:ml-0 dark:text-mintGreen"
+        :class="{ 'opacity-0': !open }"
+      >
+        <img class="hidden dark:block" width="24" src="../assets/coffeeMintGreen.png" alt="icon" />
+        <img
+          class="block dark:hidden"
+          width="24"
+          src="../assets/coffeeAccentPrimary.png"
+          alt="icon"
+        />
+        <p class="pt-2.5">{{ displayedText }}</p>
+      </div>
       <Button
         @click="$emit('toggle')"
-        :class="{ 'self-end': open }"
+        :class="{ 'self-start': open, 'z-20 -mt-6': !open }"
         variant="ghost"
         size="icon"
         class="text-foreground"

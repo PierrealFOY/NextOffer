@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { useMediaQuery, useScreenOrientation } from '@vueuse/core'
 
-export function useDeviceDetection() {
+export const useDeviceDetection = () => {
   const userAgent = ref(typeof navigator !== 'undefined' ? navigator.userAgent : '')
   const ua = computed(() => userAgent.value.toLowerCase())
 

@@ -107,7 +107,7 @@ const { isMobile } = useSidebar()
               <FormLabel>Nom d'utilisateur</FormLabel>
               <FormControl>
                 <Input
-                  class="dark:border-mintGreen"
+                  class="border-accentPrimary dark:border-mintGreen"
                   type="text"
                   placeholder="johndoe"
                   v-bind="componentField"
@@ -122,7 +122,7 @@ const { isMobile } = useSidebar()
               <FormLabel>Mot de passe</FormLabel>
               <FormControl>
                 <Input
-                  class="dark:border-mintGreen"
+                  class="border-accentPrimary dark:border-mintGreen"
                   type="password"
                   placeholder="••••••••"
                   v-bind="componentField"

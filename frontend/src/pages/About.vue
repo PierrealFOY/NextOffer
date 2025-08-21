@@ -3,43 +3,54 @@
     :initial="{ opacity: 0, y: 20 }"
     :enter="{ opacity: 1, y: 0 }"
     transition="ease-in-out"
-    class="mx-auto w-full overflow-y-visible px-2 py-16 text-center md:px-4"
+    class="relative mx-auto w-full py-16"
   >
-    <div
-      class="fixed right-1/4 top-8 h-28 w-28 items-center justify-center overflow-hidden rounded-[41%_59%_64%_36%_/_40%_25%_75%_60%] bg-gray-200 shadow-xl md:h-48 md:w-48 lg:flex"
-    >
-      <img src="../assets/photo-profil.png" alt="Image" class="h-full w-full object-cover" />
+    <div class="mt-10 flex flex-col items-end justify-end">
+      <div class="flex w-full justify-center md:mt-0 md:w-1/2 md:justify-start">
+        <div
+          class="z-10 h-40 w-40 overflow-hidden rounded-[41%_59%_64%_36%_/_40%_25%_75%_60%] bg-gray-200 shadow-xl hover:shadow-br-light hover:dark:shadow-br-dark md:h-52 md:w-52"
+        >
+          <img src="../assets/photo-profil.png" alt="Image" class="h-full w-full object-cover" />
+        </div>
+      </div>
+
+      <div class="z-10 w-4/5 justify-center self-center">
+        <h1 class="text-4xl font-extrabold text-accentPrimary dark:text-mintGreen md:text-5xl">
+          À propos
+        </h1>
+        <p class="mx-auto mt-6 p-1 text-base leading-relaxed md:mx-0 md:text-xl">
+          NextOffer est un site web qui récupère des offres d'emplois via 2 APIs publiques :
+          <span class="font-semibold italic">France Travail</span> et
+          <span class="font-semibold italic">Remotive</span>. Ce projet a été réalisé avec ❤️ par
+          moi, un développeur full-stack passionné d’UX et backend.
+        </p>
+      </div>
     </div>
 
-    <div
-      class="md:h-50 rounded-custom-shape pointer-events-none absolute right-2/4 z-0 h-40 rotate-6 bg-accentPrimary opacity-20 transition-all duration-300 ease-in-out dark:bg-mintGreen md:opacity-40"
-      :class="{
-        'w-1/3 md:w-2/5': open,
-        'md:w-1/2': !open,
-      }"
-    />
-
-    <h1 class="mt-28 text-4xl font-extrabold text-mintGreen md:text-5xl">À propos</h1>
-
-    <div class="mx-auto mt-6 max-w-4xl text-base leading-relaxed text-neutral-300 md:text-xl">
-      <p>
-        NextOffer est un site web qui récupère des offres d'emplois via 2 APIs publiques :
-        <span class="font-semibold italic">France Travail</span> et
-        <span class="font-semibold italic">Remotive</span>. Ce projet a été réalisé avec ❤️ par moi,
-        un développeur full-stack passionné d’UX et backend.
-      </p>
-
+    <div class="mx-auto mt-16 max-w-4xl text-base leading-relaxed text-neutral-300 md:text-xl">
       <div class="mt-16 flex flex-col items-center">
         <div class="mb-6 flex items-center">
-          <SquareTerminal class="text-2xl text-mintGreen md:text-3xl" />
-          <p class="ml-2 text-xl font-bold text-mintGreen md:ml-3 md:text-3xl">Stack du projet</p>
-        </div>
-        <div class="mt-4 grid w-full max-w-2xl grid-cols-1 gap-8 md:grid-cols-2">
-          <div
-            class="rounded-lg border border-mintGreen bg-neutral-800 p-6 shadow-lg transition-all duration-300 hover:shadow-mintGreen/40"
+          <SquareTerminal class="text-2xl text-accentPrimary dark:text-mintGreen md:text-3xl" />
+          <p
+            class="ml-2 text-xl font-bold text-accentPrimary dark:text-mintGreen md:ml-3 md:text-3xl"
           >
-            <h3 class="mb-4 text-xl font-semibold text-mintGreen md:text-2xl">Frontend</h3>
-            <ul class="list-inside list-none space-y-2 text-base text-neutral-300">
+            Stack du projet
+          </p>
+        </div>
+        <div
+          class="mt-4 grid w-full max-w-2xl grid-cols-1 gap-8 text-accentPrimary dark:text-mintGreen md:grid-cols-2"
+        >
+          <div
+            class="rounded-lg border border-accentPrimary bg-gray-300 p-6 text-accentPrimary shadow-lg transition-all duration-300 hover:shadow-mintGreen/40 dark:border-mintGreen dark:bg-neutral-800 dark:text-mintGreen"
+          >
+            <h3
+              class="mb-4 text-xl font-semibold text-accentPrimary dark:text-mintGreen md:text-2xl"
+            >
+              Frontend
+            </h3>
+            <ul
+              class="list-inside list-none space-y-2 text-base text-accentPrimary dark:text-mintGreen"
+            >
               <li class="flex items-center">
                 <GreenIconChecked />
                 Vue.js
@@ -55,8 +66,14 @@
             </ul>
           </div>
           <div>
-            <h3 class="mb-4 text-xl font-semibold text-mintGreen md:text-2xl">Backend</h3>
-            <ul class="list-inside list-none space-y-2 text-base text-neutral-300">
+            <h3
+              class="mb-4 text-xl font-semibold text-accentPrimary dark:text-mintGreen md:text-2xl"
+            >
+              Backend
+            </h3>
+            <ul
+              class="list-inside list-none space-y-2 text-base text-accentPrimary dark:text-mintGreen"
+            >
               <li class="flex items-center">
                 <GreenIconChecked />
                 Node.js
@@ -83,23 +100,18 @@
       </div>
     </div>
 
-    <div
-      :class="{ 'md:w-[80%]': open, 'md:w-[90%]': !open }"
-      class="absolute bottom-[-2rem] left-1/2 flex h-32 w-[90%] -translate-x-1/2 rotate-3 transform items-center overflow-hidden rounded-[89%_11%_76%_24%_/_50%_23%_25%_20%] bg-mintGreen opacity-20 md:h-48 md:opacity-30"
-    ></div>
-
     <div class="mx-auto mt-20 flex w-full flex-col items-center space-y-6 text-base md:text-lg">
       <div class="mx-auto flex max-w-3xl justify-center">
-        <p class="leading-relaxed text-neutral-300">
+        <p class="leading-relaxed dark:text-neutral-300">
           Si vous souhaitez prendre contact, je me ferais un plaisir de discuter avec vous. Vous
-          trouverez ci-dessous les différents liens pour me contacter. Bonne journée ! ☀️
+          trouverez ci-dessous les différents liens pour me contacter. Bonne journée ☀️
         </p>
       </div>
-      <div class="flex flex-col items-center space-y-4 md:flex-row md:space-x-8 md:space-y-0">
+      <div class="flex flex-col items-center space-y-4 pb-10 md:flex-row md:space-x-8 md:space-y-0">
         <a
           :href="githubUrl"
           target="_blank"
-          class="hover:text-lightMintGreen flex items-center space-x-2 text-mintGreen transition-colors duration-300 hover:underline"
+          class="flex items-center space-x-2 text-accentPrimary transition-colors duration-300 hover:underline dark:text-mintGreen"
         >
           <Github class="text-xl md:text-2xl" />
           <span>GitHub</span>
@@ -108,7 +120,7 @@
         <a
           :href="linkedinUrl"
           target="_blank"
-          class="hover:text-lightMintGreen flex items-center space-x-2 text-mintGreen transition-colors duration-300 hover:underline"
+          class="flex items-center space-x-2 text-accentPrimary transition-colors duration-300 hover:underline dark:text-mintGreen"
         >
           <Linkedin class="text-xl md:text-2xl" />
           <span>LinkedIn</span>
@@ -117,7 +129,7 @@
         <a
           :href="mailto"
           target="_blank"
-          class="hover:text-lightMintGreen flex items-center space-x-2 text-mintGreen transition-colors duration-300 hover:underline"
+          class="flex items-center space-x-2 text-accentPrimary transition-colors duration-300 hover:underline dark:text-mintGreen"
         >
           <Mail class="text-xl md:text-2xl" />
           <span>Mail</span>
@@ -130,7 +142,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { SquareTerminal, Github, Linkedin, Mail } from 'lucide-vue-next'
-import { useSidebar } from '@/components/ui/sidebar'
 import GreenIconChecked from '@/components/icons/GreenIconChecked.vue'
 const githubUrl = 'https://github.com/PierrealFOY'
 const linkedinUrl = 'https://www.linkedin.com/in/pierre-alexis-foy/'
@@ -138,8 +149,6 @@ const linkedinUrl = 'https://www.linkedin.com/in/pierre-alexis-foy/'
 const mailto = ref('#')
 const user = 'pierre.alexis.56'
 const domain = 'gmail.com'
-
-const { open } = useSidebar()
 
 onMounted(() => {
   mailto.value = `mailto:${user}@${domain}`

@@ -2,12 +2,12 @@
   <main class="flex min-h-screen w-full items-stretch overflow-x-hidden text-foreground">
     <div class="flex w-full flex-col p-4 transition-all duration-300">
       <div
-        v-if="!openMobile || !openTablet || !isDesktopDevice"
+        v-if="!openMobile || !isDesktopDevice"
         :class="{
-          'fixed top-6 z-50 h-12 w-10 rounded-xl bg-background/70 shadow-md backdrop-blur-md transition duration-300': true,
+          'fixed top-6 z-50 ml-4 h-12 w-10 rounded-xl bg-background/70 shadow-md backdrop-blur-md transition duration-300': true,
           'left-4': isLandscape,
           'left-2': !isLandscape,
-          hidden: isDesktopDevice || openTablet,
+          hidden: isDesktopDevice || (openMobile && isTabletDevice),
         }"
       >
         <Button
@@ -53,16 +53,14 @@ const jobStore = useJobStore()
 const handleSearch = (query: string) => jobStore.setSearchQuery(query)
 
 // Sidebar mobile
-const { setOpenMobile, openMobile, openTablet, setOpenTablet } = useSidebar()
-const openSidebarMobileOrTablet = () => {
-  if (isMobileDevice) {
-    setOpenMobile(true)
-  } else if (isTabletDevice) {
-  }
-  setOpenTablet(true)
-}
-
 const { isMobileDevice, isLandscape, isTabletDevice, isDesktopDevice } = useDeviceDetection()
+
+const { setOpenMobile, openMobile } = useSidebar()
+const openSidebarMobileOrTablet = () => {
+  if (isMobileDevice || isTabletDevice) {
+    setOpenMobile(true)
+  }
+}
 
 // IntersectionObserver
 const isHeaderVisible = ref(true)

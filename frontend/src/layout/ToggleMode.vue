@@ -23,20 +23,19 @@ const { isMobile } = useSidebar()
   <DropdownMenu>
     <DropdownMenuTrigger as-child>
       <Button
-        :class="{ 'border-none bg-gray-300 dark:bg-neutral-900': isMobile }"
-        class="dark:border-mintGreen"
-        variant="outline"
+        :class="{ 'bg-gray-300 dark:bg-neutral-900': isMobile }"
+        class="rounded-lg border border-accentPrimary bg-transparent dark:border-mintGreen dark:bg-neutral-800"
       >
         <Transition name="icon-fade" mode="out-in">
           <MoonIcon
             v-if="mode === 'light'"
             key="moon"
-            class="h-[1.2rem] w-[1.2rem] text-accentPrimary dark:text-mintGreen"
+            class="-m-1 h-[1.2rem] w-[1.2rem] text-accentPrimary dark:text-mintGreen"
           />
           <SunIcon
             v-else
             key="sun"
-            class="-m-2 h-[1.2rem] w-[1.2rem] text-mintGreen dark:text-mintGreen"
+            class="-m-1 h-[1.2rem] w-[1.2rem] text-mintGreen dark:text-mintGreen"
           />
         </Transition>
         <span class="sr-only">Toggle theme</span>
