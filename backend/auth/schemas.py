@@ -47,6 +47,11 @@ class SeenJobSchema(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+class AppliedJobSchema(BaseModel):
+    job: JobResponse
+
+    model_config = ConfigDict(from_attributes=True)
+
 class UserCreate(BaseModel):
     username: str
     email: str
@@ -62,6 +67,7 @@ class UserSchema(BaseModel):
     # favorite_jobs: List[JobResponse] = [] # keep JObResponse or serialize bug
     liked_jobs: List[LikedJobSchema] # keep JObResponse or serialize bug
     seen_jobs: List[SeenJobSchema]
+    applied_jobs: List[AppliedJobSchema]
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -80,6 +86,7 @@ class UserResponse(BaseModel):
     reset_password_expires_at: Optional[datetime] = None
     liked_jobs: List[LikedJobSchema] = []
     seen_jobs: List[SeenJobSchema] = []
+    applied_jobs: List[SeenJobSchema] = []
 
     model_config = ConfigDict(from_attributes=True)
 
