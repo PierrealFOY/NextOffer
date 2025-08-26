@@ -8,7 +8,7 @@
     <div
       :class="{
         'w-[80%]': !selectedJob && !isMobile,
-        'w-[30%]': selectedJob && (isDesktopDevice || isTabletDevice),
+        'max-w-[30%]': selectedJob && (isDesktopDevice || isTabletDevice),
         'w-1/3': (selectedJob && openMobile && isTabletDevice) || (isTabletDevice && !isLandscape),
         'w-[90%]': (isMobile || isTabletDevice) && !isLandscape && !selectedJob,
         'w-3/4': open && !selectedJob,
@@ -24,7 +24,7 @@
               job.id === selectedJob?.id,
             'mx-1': isMobile,
           }"
-          class="m-4 mb-4 w-full max-w-full transition-all duration-300 ease-in-out hover:scale-[102%]"
+          class="m-4 mb-4 flex w-full max-w-full flex-col transition-all duration-300 ease-in-out hover:scale-[102%]"
         >
           <JobCard
             :allowCardDetails="props.allowCardDetails"
@@ -33,9 +33,6 @@
             :job="job"
             :applyOpacity="props.applyOpacity"
           />
-        </div>
-        <div v-if="job.seen && !job.applicationSent" class="pt-20">
-          <AskIfApplied :job="job" />
         </div>
       </div>
 
@@ -64,8 +61,8 @@
     >
       <JobDetails
         :class="{
-          'w-[55%]': !open,
-          'w-[50%]': open,
+          'max-w-[60%]': !open,
+          'max-w-[55%]': open,
         }"
         class="fixed"
         :job="selectedJob"
@@ -98,7 +95,6 @@ import JobCard from './JobCard.vue'
 import type { Job } from '../types/Job'
 import { useJobStore } from '@/stores/jobStore'
 import SkeletonJobs from '@/layout/SkeletonJobs.vue'
-import AskIfApplied from './AskIfApplied.vue'
 import { ref, onMounted } from 'vue'
 import JobDetails from './JobDetails.vue'
 import { Button } from '@/components/ui/button'

@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 from auth.schemas import FavoriteJobRequest, JobBase, UserResponse
 from utils.colorText import colorText
 from services.job_aggregator import JobAggregator
-from models.models import Job, LikedJob, SeenJob, User
+from models.models import Job, LikedJob, SeenJob, AppliedJob, User
 from pydantic import BaseModel, ConfigDict, field_validator, ValidationError
 from sqlalchemy.orm import Session
 from database import get_db
@@ -198,3 +198,60 @@ async def get_seen_jobs(user_id: int, db: Session = Depends(get_db)):
                 print(colorText(f"Validation Error for seen job {job.id}: {e}", 'rouge'))
     return jobs
 
+## APPLIED JOBS ##
+@router.post("/{user_id}/apply-jobs", response_model = UserResponse)
+async def apply_job(
+    payload: FavoriteJobRequest,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    from routers.auth import get_user_by_id
+
+    # 1. check if job is already applied
+    already_applied = db.query(SeenJob).filter_by(
+        user_id=current_user.id,
+        job_id=payload.job_id,
+    ).first()
+
+    if already_applied:
+        raise HTTPException(status_code=409, detail="Job already applied")
+
+    # 2. try to find job in DB
+    job_in_db = db.query(Job).filter_by(id=payload.job_id).first()
+
+    # 3. if not in DB, fetch from aggregator
+    if not job_in_db:
+        jobs_data = await JobAggregator.aggregate_jobs(offset=0, limit=1000, db=db)
+        job_data = next((JobResponse.model_validate(job).model_dump()
+            for job in jobs_data if str(job.id) == str(payload.job_id)), None)
+        
+        if not job_data:
+            print(colorText(f"No job exists with id {payload.job_id}", 'rouge'))
+            raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Job not found")
+
+        job_in_db = Job(**job_data)
+        db.add(job_in_db)
+        db.commit()
+        db.refresh(job_in_db)
+
+    # 4. "Apply" the job
+    applied_job = SeenJob(user_id=current_user.id, job_id=payload.job_id)
+    db.add(applied_job)
+    db.commit()
+
+    return get_user_by_id(current_user.id, db)
+
+
+@router.get("/applied-jobs/{user_id}", response_model=List[JobResponse])
+async def get_applied_jobs(user_id: int, db: Session = Depends(get_db)):
+    applied_jobs = db.query(SeenJob).filter_by(user_id=user_id).all()
+    jobs: List[JobResponse] = []
+
+    for applied in applied_jobs:
+        job = db.query(Job).filter_by(id=applied.job_id).first()
+        if job:
+            try:
+                jobs.append(JobResponse.model_validate(job))
+            except ValidationError as e:
+                print(colorText(f"Validation Error for applied job {job.id}: {e}", 'rouge'))
+    return jobs

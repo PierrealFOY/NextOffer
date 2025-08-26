@@ -139,6 +139,11 @@ export const useJobStore = defineStore('jobStore', {
 
           const seenJobsForUser = await this._fetchUserJobStatus('seen-jobs')
           jobFromApi.seen = seenJobsForUser.some((seenJob) => seenJob.id === data.id)
+
+          const appliedJobsForUser = await this._fetchUserJobStatus('applied-jobs')
+          jobFromApi.applicationSent = appliedJobsForUser.some(
+            (appliedJob) => appliedJob.id === data.id,
+          )
         }
         return jobFromApi
       } catch (error) {
@@ -330,6 +335,70 @@ export const useJobStore = defineStore('jobStore', {
       })
       console.log('Seen jobs status synchronized.')
     },
+    async applyJob(jobId: string) {
+      const job = this.jobs.find((j) => j.id === jobId)
+      if (!job) return false
+      if (job.applicationSent) {
+        console.log(`Job ${jobId} is already applied locally.`)
+        return true
+      }
+
+      const originalAppliedStatus = job.applicationSent
+      job.applicationSent = true
+
+      try {
+        const authStore = useAuthStore()
+        const token = authStore.token
+        if (!token) {
+          console.error('auht token missing to apply the job')
+          job.seen = originalAppliedStatus
+          return false
+        }
+        const response = await fetch(
+          `${API_URL}/api/jobs/${authStore.currentUser?.id}/apply-jobs`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ job_id: jobId }),
+          },
+        )
+
+        if (!response.ok) {
+          if (response.status === 409) {
+            console.warn(`Job ${jobId} already applied on the server`)
+          } else {
+            const errorText = await response.text()
+            throw new Error(`Fail on action apply job: ${response.status} - ${errorText}`)
+          }
+        }
+        console.log(`Job ${jobId} applied successfully.`)
+        return true
+      } catch (error) {
+        console.error('Failed to apply job:', error)
+        showNetworkErrorToast()
+        job.applicationSent = originalAppliedStatus
+        return false
+      }
+    },
+    async fetchAppliedJobs() {
+      if (!this.currentUser?.id) {
+        this.jobs.forEach((job) => {
+          job.applicationSent = false
+        })
+        console.error('User ID is missing — cannot fetch applied jobs.')
+        return
+      }
+
+      const appliedJobsData = await this._fetchUserJobStatus('applied-jobs')
+
+      this.jobs.forEach((job) => {
+        job.applicationSent = appliedJobsData.some((appliedJob) => appliedJob.id === job.id)
+      })
+      console.log('Applied jobs status synchronized.')
+    },
     async clearAndFetchUserJobStatuses() {
       // first clear all job statuses
       this.jobs.forEach((job) => {
@@ -342,7 +411,7 @@ export const useJobStore = defineStore('jobStore', {
       if (this.currentUser?.id) {
         await this.fetchLikedJobs()
         await this.fetchSeenJobs()
-        // TODO manage applied jobs
+        await this.fetchAppliedJobs()
       }
     },
   },
