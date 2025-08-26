@@ -81,6 +81,7 @@ class User(Base):
     # favorite_jobs = relationship("Job", secondary="favorite_jobs")
     liked_jobs = relationship("LikedJob", back_populates="user")
     seen_jobs = relationship("SeenJob", back_populates="user")
+    applied_jobs = relationship("AppliedJob", back_populates="user")
     # jobs = relationship("Job", secondary="liked_jobs")
 
 # class FavoriteJob(Base):
@@ -108,4 +109,14 @@ class SeenJob(Base):
     job_id = Column(String, ForeignKey("jobs.id"))
 
     user = relationship("User", back_populates="seen_jobs")
+    job = relationship("Job", lazy="joined")
+
+class AppliedJob(Base):
+    __tablename__ = "applied_jobs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    job_id = Column(String, ForeignKey("jobs.id"))
+
+    user = relationship("User", back_populates="applied_jobs")
     job = relationship("Job", lazy="joined")
