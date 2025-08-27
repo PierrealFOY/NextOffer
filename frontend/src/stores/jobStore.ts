@@ -21,14 +21,14 @@ export const useJobStore = defineStore('jobStore', {
     searchQuery: '',
   }),
   getters: {
-    isJobAlreadyLiked: (state) => (jobId: string) => {
+    isJobAlreadyLiked: (state) => (jobId: number) => {
       return state.jobs.some((job) => job.id === jobId && job.liked)
     },
-    isJobAlreadySeen: (state) => (jobId: string) => {
+    isJobAlreadySeen: (state) => (jobId: number) => {
       return state.jobs.some((job) => job.id === jobId && job.seen)
     },
     currentUser: (): User | null => useAuthStore().currentUser,
-    getJobById: (state) => (id: string) => state.jobs.find((job) => job.id === id),
+    getJobById: (state) => (id: number) => state.jobs.find((job) => job.id === id),
     likedJobs: (state) => state.jobs.filter((job) => job.liked),
     seenJobs: (state) => state.jobs.filter((job) => job.seen),
     appliedJobs: (state) => state.jobs.filter((job) => job.seen && job.applicationSent),
@@ -49,7 +49,7 @@ export const useJobStore = defineStore('jobStore', {
     setSearchQuery(query: string) {
       this.searchQuery = query
     },
-    async toggleLikeWithFeedback(jobId: string) {
+    async toggleLikeWithFeedback(jobId: number) {
       const job = this.getJobById(jobId)
       if (!job) return
 
@@ -151,12 +151,11 @@ export const useJobStore = defineStore('jobStore', {
         return null
       }
     },
-    async likeJob(jobId: string) {
-      const jobIdStr = jobId.toString()
-      const job = this.jobs.find((j) => j.id === jobIdStr)
+    async likeJob(jobId: number) {
+      const job = this.jobs.find((j) => j.id === jobId)
       if (!job) return false
       if (this.isJobAlreadyLiked(jobId)) {
-        console.log(`Job ${jobIdStr} is already liked locally.`)
+        console.log(`Job ${jobId} is already liked locally.`)
         return true
       }
 
@@ -182,12 +181,12 @@ export const useJobStore = defineStore('jobStore', {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ job_id: jobIdStr }),
+          body: JSON.stringify({ job_id: jobId }),
         })
 
         if (!response.ok) {
           if (response.status === 409) {
-            console.warn(`Job ${jobIdStr} is already liked by the server`)
+            console.warn(`Job ${jobId} is already liked by the server`)
           } else {
             const errorText = await response.text()
             throw new Error(`Faile on liking job action: ${response.status} - ${errorText}`)
@@ -202,7 +201,7 @@ export const useJobStore = defineStore('jobStore', {
         return false
       }
     },
-    async unlikeJob(jobId: string) {
+    async unlikeJob(jobId: number) {
       const job = this.jobs.find((j) => j.id === jobId)
       if (!job) return false
 
@@ -267,14 +266,14 @@ export const useJobStore = defineStore('jobStore', {
       })
       console.log('Liked jobs status synchronized.')
     },
-    async toggleLikeJob(jobId: string, isAlreadyLiked: boolean) {
+    async toggleLikeJob(jobId: number, isAlreadyLiked: boolean) {
       return isAlreadyLiked ? await this.unlikeJob(jobId) : await this.likeJob(jobId)
     },
     updateJob(updatedJob: Job) {
       const index = this.jobs.findIndex((job) => job.id === updatedJob.id)
       if (index !== -1) Object.assign(this.jobs[index], updatedJob)
     },
-    async seeJob(jobId: string) {
+    async seeJob(jobId: number) {
       const job = this.jobs.find((j) => j.id === jobId)
       if (!job) return false
       if (job.seen) {
@@ -335,7 +334,7 @@ export const useJobStore = defineStore('jobStore', {
       })
       console.log('Seen jobs status synchronized.')
     },
-    async applyJob(jobId: string) {
+    async applyJob(jobId: number) {
       const job = this.jobs.find((j) => j.id === jobId)
       if (!job) return false
       if (job.applicationSent) {
