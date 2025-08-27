@@ -1,37 +1,67 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+from sqlite3 import IntegrityError
 from typing import List
 
-from requests import Session
-from auth.schemas import JobResponse
+from utils.colorText import colorText
+from sqlalchemy.orm import Session
+
+from auth.schemas import JobBase, JobResponse
+from database import get_db
+from models.models import Job
 from services.external_apis.remotive import RemotiveService
-# from services.external_apis.serpapi import SerpAPIService
 from services.external_apis.francetravail import FranceTravailService
 from core.config import settings
 
 class JobAggregator:
     @staticmethod
-    async def aggregate_jobs(offset: int = 0, limit: int = settings.JOB_LIMIT, db: Session = None) -> List[JobResponse]:
+    async def aggregate_jobs(db: Session) -> None:
+        """
+        Agrège les offres d'emploi des différentes sources et les enregistre dans la base de données.
+        """
         loop = asyncio.get_running_loop()
         remotive_future = loop.run_in_executor(None, RemotiveService.fetch_jobs)
-        # serpapi_future = loop.run_in_executor(None, SerpAPIService.fetch_jobs)
 
-        france_travail_jobs = await FranceTravailService.fetch_jobs()
+        # retrieve jobs in parallel from Remotive and FranceTravail
+        remotive_jobs, france_travail_jobs = await asyncio.gather(remotive_future, FranceTravailService.fetch_jobs())
 
-        remotive_jobs = await asyncio.gather(remotive_future)
+        all_jobs: List[JobBase] = remotive_jobs + france_travail_jobs
+        print(colorText(f"{len(all_jobs)} jobs found.", 'vert_fonce'))
 
-        all_jobs = remotive_jobs[0] + france_travail_jobs
+        jobs_to_add = []
+        for job_base in all_jobs:
+            # Check if url already exists in DB
+            existing_job = db.query(Job).filter(Job.url == job_base.url).first()
+            if not existing_job:
+                # Create new instance of Job from JobBase
+                new_job = Job(
+                    external_id=job_base.external_id,
+                    title=job_base.title,
+                    company=job_base.company,
+                    url=job_base.url,
+                    source=job_base.source,
+                    location=job_base.location,
+                    salary=job_base.salary,
+                    description=job_base.description,
+                    typeContrat=job_base.typeContrat,
+                    dateCreation=job_base.dateCreation,
+                    liked=False
+                )
+                jobs_to_add.append(new_job)
+                
+        if jobs_to_add:
+            try:
+                db.bulk_save_objects(jobs_to_add)
+                db.commit()
+                print(colorText(f"{len(jobs_to_add)} new jobs saved to DB.", 'vert_fonce'))
+            except IntegrityError as e:
+                db.rollback()
+                print(colorText(f"Error saving jobs to DB: {e}", 'rouge'))
 
-        # remove duplicates based on URL
-        unique_jobs = []
-        seen_urls = set()
-        for job in all_jobs:
-            if job.url and job.url not in seen_urls: # Ensure URL exists for de-duplication
-                seen_urls.add(job.url)
-                unique_jobs.append(job)
-            elif not job.url: # If job has no URL, append it anyway, or handle as desired
-                unique_jobs.append(job)
-
-        paginated_jobs = unique_jobs[offset : offset + limit]
-
-        return paginated_jobs
+    @staticmethod
+    def get_jobs_from_db(offset: int, limit: int, db: Session) -> List[Job]:
+        """
+        Récupère les offres d'emploi directement depuis la base de données.
+        """
+        print(colorText(f"Retrieving {limit} jobs from DB.", 'vert_fonce'))
+        return db.query(Job).offset(offset).limit(limit).all()
