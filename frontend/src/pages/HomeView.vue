@@ -98,7 +98,7 @@ const { isMobile, open } = useSidebar()
       </h2>
       <div ref="featuresRef" class="mx-auto grid max-w-4xl grid-cols-1 gap-8 md:grid-cols-3">
         <div
-          class="flex transform flex-col items-center rounded-lg border border-border bg-background p-6 transition-transform duration-300 hover:scale-105 hover:shadow-br-light"
+          class="flex transform flex-col items-center rounded-lg border bg-background p-6 transition-transform duration-300 hover:scale-105 hover:shadow-br-light dark:hover:shadow-br-dark"
         >
           <Search class="mb-4 h-12 w-12 text-accentPrimary dark:text-mintGreen" />
           <h3 class="mb-2 text-xl font-semibold">Offres Filtrées</h3>
@@ -107,7 +107,7 @@ const { isMobile, open } = useSidebar()
           </p>
         </div>
         <div
-          class="flex transform flex-col items-center rounded-lg border border-border bg-background p-6 shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-br-light"
+          class="flex transform flex-col items-center rounded-lg border border-border bg-background p-6 shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-br-light dark:hover:shadow-br-dark"
         >
           <Star class="mb-4 h-12 w-12 text-accentPrimary dark:text-mintGreen" />
           <h3 class="mb-2 text-xl font-semibold">Expérience Utilisateur Intuitive</h3>
@@ -116,7 +116,7 @@ const { isMobile, open } = useSidebar()
           </p>
         </div>
         <div
-          class="flex transform flex-col items-center rounded-lg border border-border bg-background p-6 shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-br-light"
+          class="flex transform flex-col items-center rounded-lg border border-border bg-background p-6 shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-br-light dark:hover:shadow-br-dark"
         >
           <ShieldCheck class="mb-4 h-12 w-12 text-accentPrimary dark:text-mintGreen" />
           <h3 class="mb-2 text-xl font-semibold">Sécurité et Fiabilité</h3>
