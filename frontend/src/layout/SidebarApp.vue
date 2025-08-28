@@ -42,11 +42,6 @@ const pages = {
       icon: Home,
       to: '/',
     },
-    {
-      title: 'À propos',
-      icon: Info,
-      to: '/about',
-    },
   ],
   myJobs: [
     {
@@ -78,6 +73,13 @@ const pages = {
       title: 'Les offres',
       icon: BriefcaseBusiness,
       to: '/offers',
+    },
+  ],
+  about: [
+    {
+      title: 'À propos',
+      icon: Info,
+      to: '/about',
     },
   ],
 }
@@ -187,7 +189,7 @@ onMounted(() => {
   <!-- Mobile -->
   <Sidebar
     v-if="isMobileDevice || isTabletDevice"
-    class="fixed inset-y-0 left-0 z-40 flex h-fit w-64 transform flex-col border-r border-border bg-gray-300 text-accentPrimary shadow-xl transition-transform duration-300 ease-in-out dark:bg-neutral-800 dark:text-mintGreen"
+    class="relative inset-y-0 left-0 z-40 flex h-fit w-64 transform flex-col border-r border-border bg-gray-300 text-accentPrimary shadow-xl transition-transform duration-300 ease-in-out dark:bg-neutral-800 dark:text-mintGreen"
     :class="{
       'translate-x-0': openMobile,
       '-translate-x-full': !openMobile,
@@ -303,10 +305,24 @@ onMounted(() => {
                 </span>
               </RouterLink>
             </li>
+            <li v-for="item in pages.about" :key="item.to + '-mobile'">
+              <RouterLink
+                :to="item.to"
+                @click="closeSidebar"
+                class="flex items-center space-x-3 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
+              >
+                <component :is="item.icon" class="h-5 w-5" />
+                <span
+                  :class="{ 'text-green-800 underline dark:text-mintGreen': isLinkActive(item.to) }"
+                >
+                  {{ item.title }}
+                </span>
+              </RouterLink>
+            </li>
           </ul>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter class="p-1">
+      <SidebarFooter class="absolute bottom-4 w-full p-1">
         <div class="flex flex-col">
           <template v-if="isLoggedIn && user !== null">
             <NavUser :user="user" />
@@ -348,7 +364,7 @@ onMounted(() => {
     variant="sidebar"
     collapsible="none"
     v-else-if="!isMobileDevice && !isTabletDevice"
-    class="sticky z-30 flex h-screen transform flex-col border-r border-border bg-baseMedium shadow-br-light transition-all duration-300 ease-in-out dark:bg-neutral-800 dark:shadow-br-dark"
+    class="relative z-30 flex h-full transform flex-col border-r border-border bg-baseMedium shadow-br-light transition-all duration-300 ease-in-out dark:bg-neutral-800 dark:shadow-br-dark"
   >
     <SidebarHeader
       class="flex items-center p-4"
@@ -398,64 +414,84 @@ onMounted(() => {
           </li>
 
           <li v-for="(group, groupIndex) in pages.myJobs" :key="`job-group-desktop-${groupIndex}`">
-            <Collapsible v-model="openCollapsible" class="space-y-1">
-              <CollapsibleTrigger as-child v-if="open">
-                <Button
-                  variant="ghost"
-                  class="flex w-full items-center justify-between px-4 py-2 text-left"
-                  @click="handleCollapsibleToggle('my-jobs-group-desktop')"
-                >
-                  <div class="flex items-center space-x-3">
-                    <component :is="group.icon" class="h-5 w-5" />
-                    <span
-                      :class="{
-                        'text-green-800 underline dark:text-mintGreen': isCollapsibleGroupActive(
-                          group.items,
-                        ),
-                      }"
-                    >
-                      {{ group.title }}
-                    </span>
-                  </div>
-                  <ChevronDown
-                    :class="{ 'rotate-180': openCollapsible === 'my-jobs-group-desktop' }"
-                    class="h-4 w-4 transition-transform duration-200"
-                  />
-                </Button>
-              </CollapsibleTrigger>
-              <RouterLink
-                v-else
-                :to="group.to"
-                class="flex justify-center rounded-md py-2 text-foreground transition-colors hover:bg-gray-100"
-                :class="{ 'text-green-800 underline dark:text-mintGreen': isLinkActive(group.to) }"
-                :title="group.title"
-              >
-                <component :is="group.icon" class="h-5 w-5" />
-              </RouterLink>
-
-              <CollapsibleContent v-if="open" class="ml-4 mt-1 space-y-1">
-                <ul class="space-y-1">
-                  <li
-                    v-for="(subItem, subIndex) in group.items"
-                    :key="`my-jobs-sub-desktop-${subIndex}`"
+            <div >
+              <Collapsible v-model="openCollapsible" class="space-y-1">
+                <CollapsibleTrigger as-child v-if="open">
+                  <Button
+                    variant="ghost"
+                    class="flex w-full items-center justify-between px-4 py-2 text-left"
+                    @click="handleCollapsibleToggle('my-jobs-group-desktop')"
                   >
-                    <RouterLink
-                      :to="subItem.to"
-                      class="flex items-center space-x-2 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
-                      :class="{
-                        'text-green-800 underline dark:text-mintGreen': isLinkActive(subItem.to),
-                      }"
+                    <div class="flex items-center space-x-3">
+                      <component :is="group.icon" class="h-5 w-5" />
+                      <span
+                        :class="{
+                          'text-green-800 underline dark:text-mintGreen': isCollapsibleGroupActive(
+                            group.items,
+                          ),
+                        }"
+                      >
+                        {{ group.title }}
+                      </span>
+                    </div>
+                    <ChevronDown
+                      :class="{ 'rotate-180': openCollapsible === 'my-jobs-group-desktop' }"
+                      class="h-4 w-4 transition-transform duration-200"
+                    />
+                  </Button>
+                </CollapsibleTrigger>
+                <RouterLink
+                  v-else
+                  :to="group.to"
+                  class="flex justify-center rounded-md py-2 text-foreground transition-colors hover:bg-gray-100"
+                  :class="{
+                    'text-green-800 underline dark:text-mintGreen': isLinkActive(group.to),
+                  }"
+                  :title="group.title"
+                >
+                  <component :is="group.icon" class="h-5 w-5" />
+                </RouterLink>
+
+                <CollapsibleContent v-if="open" class="ml-4 mt-1 space-y-1">
+                  <ul class="space-y-1">
+                    <li
+                      v-for="(subItem, subIndex) in group.items"
+                      :key="`my-jobs-sub-desktop-${subIndex}`"
                     >
-                      <component :is="subItem.icon" class="h-5 w-5" v-if="subItem.icon" />
-                      <span>{{ subItem.title }}</span>
-                    </RouterLink>
-                  </li>
-                </ul>
-              </CollapsibleContent>
-            </Collapsible>
+                      <RouterLink
+                        :to="subItem.to"
+                        class="flex items-center space-x-2 rounded-md px-4 py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
+                        :class="{
+                          'text-green-800 underline dark:text-mintGreen': isLinkActive(subItem.to),
+                        }"
+                      >
+                        <component :is="subItem.icon" class="h-5 w-5" v-if="subItem.icon" />
+                        <span>{{ subItem.title }}</span>
+                      </RouterLink>
+                    </li>
+                  </ul>
+                </CollapsibleContent>
+              </Collapsible>
+            </div>
           </li>
 
           <li v-for="item in pages.offers" :key="item.to + '-desktop'">
+            <RouterLink
+              :to="item.to"
+              class="flex items-center space-x-3 rounded-md py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
+              :class="{
+                'px-4': open,
+                'justify-center': !open,
+                'text-green-800 underline dark:text-mintGreen': isLinkActive(item.to),
+              }"
+              :title="!open ? item.title : ''"
+            >
+              <component :is="item.icon" class="h-5 w-5" />
+              <span v-if="open">{{ item.title }}</span>
+            </RouterLink>
+          </li>
+
+          <li v-for="item in pages.about" :key="item.to + '-desktop'">
             <RouterLink
               :to="item.to"
               class="flex items-center space-x-3 rounded-md py-2 text-foreground transition-colors hover:bg-gray-100 dark:hover:bg-black"
@@ -474,8 +510,8 @@ onMounted(() => {
       </SidebarGroup>
     </SidebarContent>
 
-    <SidebarFooter class="flex h-full flex-col">
-      <div v-if="open" class="flex h-full w-full flex-col justify-center space-y-2">
+    <SidebarFooter class="absolute bottom-0 w-full p-4">
+      <div v-if="open" class="sticky flex w-[90%] flex-col justify-end space-y-2">
         <template v-if="isLoggedIn && user !== null">
           <NavUser :user="user" />
           <a
