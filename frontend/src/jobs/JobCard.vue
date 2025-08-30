@@ -106,7 +106,7 @@ const handletoggleLikeJob = async () => {
   await jobStore.toggleLikeWithFeedback(props.job.id)
 }
 
-const jobSeen = async (jobId: string) => {
+const jobSeen = async (jobId: number) => {
   await jobStore.seeJob(jobId)
   if (props.job.url) {
     window.open(props.job.url, '_blank')
@@ -125,9 +125,9 @@ const dateCreationFormatted = computed(() => {
 
 const route = useRoute()
 const router = useRouter()
-const jobId = computed(() => route.params.jobId as string)
+const jobId = computed(() => route.params.jobId)
 const jobStore = useJobStore()
-const jobFromStore = computed(() => jobStore.getJobById(jobId.value))
+const jobFromStore = computed(() => jobStore.getJobById(Number(jobId.value)))
 const jobData = computed(() => props.job ?? jobFromStore.value)
 const { isMobile } = useSidebar()
 const goToJobDetails = (job: Job) => {
