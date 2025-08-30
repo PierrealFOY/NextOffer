@@ -42,26 +42,28 @@ services:
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile.dev
     ports:
       - "5173:5173"
     volumes:
       - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
     networks:
       - app-network
 
-  nginx:
-    image: nginx:latest
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.local.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - frontend
-      - backend
-    networks:
-      - app-network
+  # nginx:
+  #   image: nginx:latest
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx/nginx.local.conf:/etc/nginx/nginx.conf:ro
+  #   depends_on:
+  #     # - frontend
+  #     - backend
+  #   networks:
+  #     - app-network
 
   # ggshield:
   #   image: gitguardian/ggshield

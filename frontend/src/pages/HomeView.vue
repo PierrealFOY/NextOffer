@@ -70,16 +70,13 @@ const { isMobile, open } = useSidebar()
         class="animate-pulse-slow absolute inset-0 from-primary/10 to-secondary/10 opacity-30"
       ></div>
 
-      <div
-        :class="{
-          'md:max-w-[calc(100%-350px)]': open,
-          'md:max-w-[calc(100%-80px)]': !open,
-        }"
-        class="w-full transition-all duration-300 md:w-4/5 ease-in-out"
-      >
-        <h1 ref="heroTitle" class="mb-4 flex text-center text-2xl font-extrabold md:text-5xl">
-          <TextShadow v-if="!isMobile" class="leading-6">Trouvez l'emploi idéal</TextShadow>
-          <p v-else-if="isMobile" class="pl-8 leading-10">Trouvez l'emploi idéal</p>
+      <div class="w-full transition-all duration-300 ease-in-out md:w-4/5">
+        <h1
+          ref="heroTitle"
+          class="mb-4 flex justify-center text-center text-2xl font-extrabold md:text-4xl"
+        >
+          <TextShadow v-if="!isMobile" class="leading-12">Trouvez l'emploi idéal</TextShadow>
+          <p v-else-if="isMobile" class="leading-12 pl-8">Trouvez l'emploi idéal</p>
         </h1>
         <p ref="heroSubtitle" class="mb-8 text-lg text-muted-foreground md:text-xl">
           Accédez à des milliers d'offres d'emploi en présentiel, en télétravail ou en hybride,
@@ -101,7 +98,7 @@ const { isMobile, open } = useSidebar()
       </h2>
       <div ref="featuresRef" class="mx-auto grid max-w-4xl grid-cols-1 gap-8 md:grid-cols-3">
         <div
-          class="flex transform flex-col items-center rounded-lg border border-border bg-background p-6 transition-transform duration-300 hover:scale-105 hover:shadow-br-light"
+          class="flex transform flex-col items-center rounded-lg border bg-background p-6 transition-transform duration-300 hover:scale-105 hover:shadow-br-light dark:hover:shadow-br-dark"
         >
           <Search class="mb-4 h-12 w-12 text-accentPrimary dark:text-mintGreen" />
           <h3 class="mb-2 text-xl font-semibold">Offres Filtrées</h3>
@@ -110,7 +107,7 @@ const { isMobile, open } = useSidebar()
           </p>
         </div>
         <div
-          class="flex transform flex-col items-center rounded-lg border border-border bg-background p-6 shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-br-light"
+          class="flex transform flex-col items-center rounded-lg border border-border bg-background p-6 shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-br-light dark:hover:shadow-br-dark"
         >
           <Star class="mb-4 h-12 w-12 text-accentPrimary dark:text-mintGreen" />
           <h3 class="mb-2 text-xl font-semibold">Expérience Utilisateur Intuitive</h3>
@@ -119,7 +116,7 @@ const { isMobile, open } = useSidebar()
           </p>
         </div>
         <div
-          class="flex transform flex-col items-center rounded-lg border border-border bg-background p-6 shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-br-light"
+          class="flex transform flex-col items-center rounded-lg border border-border bg-background p-6 shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-br-light dark:hover:shadow-br-dark"
         >
           <ShieldCheck class="mb-4 h-12 w-12 text-accentPrimary dark:text-mintGreen" />
           <h3 class="mb-2 text-xl font-semibold">Sécurité et Fiabilité</h3>

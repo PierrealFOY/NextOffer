@@ -1,9 +1,10 @@
 import requests
 import time
+from datetime import datetime
 from typing import List
 from models.models import Job
 from core.config import settings
-from auth.schemas import JobResponse
+from auth.schemas import JobBase, JobResponse
 from utils.colorText import colorText
 
 _francetravail_token_cache = {
@@ -55,7 +56,7 @@ async def get_francetravail_access_token():
 
 class FranceTravailService:
     @staticmethod
-    async def fetch_jobs() -> List[JobResponse]:
+    async def fetch_jobs() -> List[JobBase]:
         access_token = await get_francetravail_access_token()
         if not access_token:
             print("Impossible d'obtenir le token France Travail, étape suivante.")
@@ -64,9 +65,10 @@ class FranceTravailService:
         try:
             params = {
                 "accesTravailleurHandicape": "false",
-                #TODO: on deploy, remove "developpeur" to let the results free
-                "motsCles": "développeur",
+                "motsCles":"" if settings.ENV == "prod" else "développeur",
             }
+            print(settings.ENV)
+            print(colorText(f"France Travail env actuel (pour motsClés): {settings.ENV}.", "bleu"))
             headers = {
                 "Authorization": f"Bearer {access_token}",
                 "Accept": "application/json"
@@ -76,11 +78,13 @@ class FranceTravailService:
             response.raise_for_status()
 
             data = response.json()
-            jobs = []
+            jobs: List[JobBase] = []
 
             for offre in data.get("resultats", []):
-                job = Job(
-                    id=offre.get("id", ""),
+                date_creation_str = offre.get("dateCreation")
+                date_creation = datetime.strptime(date_creation_str, "%Y-%m-%dT%H:%M:%S.%fZ").date() if date_creation_str else None
+                job = JobBase(
+                    external_id=str(offre.get("id", "")),
                     title=offre.get("intitule", ""),
                     company=offre.get("entreprise", {}).get("nom", ""),
                     url=offre.get("contact", {}).get("urlPostulation", "") or "",
@@ -89,11 +93,10 @@ class FranceTravailService:
                     salary=offre.get("salaire", {}).get("libelle", ""),
                     description=offre.get("description", {}),
                     typeContrat=offre.get("typeContrat", {}),
-                    dateCreation=offre.get("dateCreation", {})
+                    dateCreation=date_creation,
                 )
                 jobs.append(job)
             print(colorText(f"France Travail: {len(jobs)} jobs fetched.", "bleu"))
-            return [JobResponse.from_orm(job) for job in jobs]
         except requests.exceptions.RequestException as e:
             print(f"Error fetching from France Travail: {e}")
             if e.response is not None:
@@ -102,3 +105,4 @@ class FranceTravailService:
         except Exception as e:
             print(f"Unexpected error fetching from France Travail: {e}")
             return []
+        return jobs

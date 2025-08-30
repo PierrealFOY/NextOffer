@@ -12,6 +12,8 @@ from utils.colorText import colorText
 
 settings = Settings()
 
+print(colorText(f"Current env: {settings.ENV}", "orange"))
+
 app = FastAPI(
     title="NextOffer API",
     description="A FastAPI backend for aggregating job listings from various sources.",

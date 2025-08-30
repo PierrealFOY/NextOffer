@@ -9,6 +9,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useSidebar } from '@/components/ui/sidebar'
+import { toast } from '@/components/ui/toast'
+
+const API_URL = import.meta.env.VITE_API_URL
 
 const formSchema = toTypedSchema(
   z
@@ -49,13 +53,16 @@ const onSubmit = form.handleSubmit(async (values) => {
   isLoading.value = true
 
   try {
-    await axios.post('http://localhost:8000/api/auth/register', {
+    await axios.post(`${API_URL}/api/auth/register`, {
       username: values.username,
       email: values.email,
       password: values.password,
     })
 
-    successMessage.value = 'Inscription réussie ! Vous pouvez maintenant vous connecter.'
+    toast({
+      class: 'text-green-500 bg-neutral-800',
+      title: 'Inscription réussie ! Vous pouvez maintenant vous connecter !',
+    })
     form.resetForm()
   } catch (err) {
     console.error('Registration error:', err)
@@ -70,11 +77,15 @@ const onSubmit = form.handleSubmit(async (values) => {
     isLoading.value = false
   }
 })
+const { isMobile } = useSidebar()
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center">
-    <Card class="w-96">
+  <div class="flex min-h-screen flex-col items-center justify-start pb-16">
+    <Card
+      :class="{ '-ml-4 mb-20 mt-16 w-[95%]': isMobile, 'mt-20 w-2/3': !isMobile }"
+      class="h-fit border border-accentPrimary shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
+    >
       <CardHeader>
         <CardTitle class="text-center text-2xl font-bold">Inscription</CardTitle>
         <CardDescription class="text-center">Créez votre compte</CardDescription>
@@ -85,7 +96,12 @@ const onSubmit = form.handleSubmit(async (values) => {
             <FormItem>
               <FormLabel>Nom d'utilisateur</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="johndoe" v-bind="componentField" />
+                <Input
+                  class="border-accentPrimary dark:border-mintGreen"
+                  type="text"
+                  placeholder="johndoe"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -95,7 +111,12 @@ const onSubmit = form.handleSubmit(async (values) => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="john.doe@example.com" v-bind="componentField" />
+                <Input
+                  class="border-accentPrimary dark:border-mintGreen"
+                  type="email"
+                  placeholder="john.doe@example.com"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -105,7 +126,12 @@ const onSubmit = form.handleSubmit(async (values) => {
             <FormItem>
               <FormLabel>Mot de passe</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" v-bind="componentField" />
+                <Input
+                  class="border-accentPrimary dark:border-mintGreen"
+                  type="password"
+                  placeholder="••••••••"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -115,16 +141,23 @@ const onSubmit = form.handleSubmit(async (values) => {
             <FormItem>
               <FormLabel>Confirmer le mot de passe</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" v-bind="componentField" />
+                <Input
+                  class="border-accentPrimary dark:border-mintGreen"
+                  type="password"
+                  placeholder="••••••••"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
 
-          <Button type="submit" class="w-full" :disabled="isLoading">
-            <span v-if="isLoading">Inscription en cours...</span>
-            <span v-else>S'inscrire</span>
-          </Button>
+          <div class="pt-8">
+            <Button type="submit" class="w-full dark:bg-mintGreen" :disabled="isLoading">
+              <span v-if="isLoading">Inscription en cours...</span>
+              <span v-else>S'inscrire</span>
+            </Button>
+          </div>
 
           <p v-if="successMessage" class="mt-4 text-center text-sm text-green-500">
             {{ successMessage }}

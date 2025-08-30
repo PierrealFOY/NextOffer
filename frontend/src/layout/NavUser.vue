@@ -60,7 +60,7 @@ const goToAccount = () => {
           </SidebarMenuButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          class="w-[--reka-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+          class="dar:border-mintGreen w-[--reka-dropdown-menu-trigger-width] min-w-56 rounded-lg border border-accentPrimary bg-gray-200 dark:border-mintGreen dark:bg-neutral-800"
           :side="isMobile ? 'bottom' : 'right'"
           align="end"
           :side-offset="4"
@@ -77,16 +77,22 @@ const goToAccount = () => {
               </div>
             </div>
           </DropdownMenuLabel>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator class="bg-accentPrimary dark:bg-mintGreen" />
           <DropdownMenuGroup>
-            <DropdownMenuItem @click="goToAccount">
-              <BadgeCheck />
-              Account
+            <DropdownMenuItem class="cursor-pointer" @click="goToAccount">
+              <Button variant="ghost" class="hover:bg-gray-300 dark:hover:bg-neutral-900">
+                <BadgeCheck />
+                Account
+              </Button>
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator class="bg-accentPrimary dark:bg-mintGreen" />
           <DropdownMenuItem>
-            <Button variant="ghost" class="p-0 text-red-500" @click="authStore.logout">
+            <Button
+              variant="destructive"
+              class="bg-red-400 p-2 font-bold dark:bg-red-600 dark:text-white dark:hover:bg-red-400"
+              @click="authStore.logout"
+            >
               <LogOut />
               Déconnexion
             </Button>

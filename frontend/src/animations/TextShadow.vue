@@ -30,7 +30,6 @@ const makeLongShadow = (color: string, steps: number = 10): string => {
 // Computed shadow depending on scroll
 const currentShadow = computed(() => {
   const maxSteps = 30
-  const minSteps = 0
 
   const steps = Math.min(maxSteps, Math.floor(scrollY.value / 20))
   return makeLongShadow('#8A9A5B', steps)
@@ -39,7 +38,7 @@ const currentShadow = computed(() => {
 
 <style scoped>
 .text-container {
-  @apply mx-auto overflow-hidden p-10 text-left font-serif text-[3rem] font-semibold leading-[20px] text-[#EDEEE9];
+  @apply mx-auto overflow-hidden p-10 font-serif text-[3rem] font-semibold text-neutral-700 dark:text-[#EDEEE9];
   transition: text-shadow 0.3s ease;
 }
 </style>

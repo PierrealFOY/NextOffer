@@ -27,9 +27,9 @@ const props = defineProps<{
 
 const route = useRoute()
 const router = useRouter()
-const jobId = computed(() => route.params.jobId as string)
+const jobId = computed(() => route.params.jobId)
 const jobStore = useJobStore()
-const jobFromStore = computed(() => jobStore.getJobById(jobId.value))
+const jobFromStore = computed(() => jobStore.getJobById(Number(jobId.value)))
 const jobData = computed(() => props.job ?? jobFromStore.value)
 
 const sanitizedDescription = computed(() =>
@@ -44,49 +44,51 @@ const goToJobDetailsPage = () => {
   }
 }
 const { isMobile, open } = useSidebar()
-
 const isHeaderVisible = inject('isHeaderVisible', ref(true))
 
 const containerClasses = computed(() => {
-  if (isMobile.value) return 'mt-6 w-[85vw] mx-4'
+  if (isMobile.value) return 'mt-6 w-[90vw] justify-center -mx-1'
   if (isFullScreen.value) {
-    return open.value ? 'mt-10 w-[85vw]' : 'mt-10 w-[85vw] pb-10 overflow-y-auto overflow-x-hidden'
+    return open.value ? 'mt-10 w-[90vw]' : 'mt-10 w-[85vw] pb-10 overflow-y-auto overflow-x-hidden'
   }
-  return isHeaderVisible.value ? 'top-16 mt-16 h-[68%]' : 'top-2 mt-0 h-[85vh]'
+  return isHeaderVisible.value ? 'top-16 mt-16 h-[68%]' : 'top-2 mt-0 h-[90%]'
 })
 
 const cardWidthClass = computed(() => {
-  if (isFullScreen.value) return open.value ? 'w-[80%] self-center' : 'w-[90%]'
-  return open.value ? 'w-[90%]' : 'w-[95%]'
+  if (isFullScreen.value) return open.value ? 'w-[85%] h-[90%] ' : 'w-[90%]'
+  return open.value ? 'w-[95%]' : 'w-[95%]'
 })
 
 const descriptionHeightClass = computed(() => {
   if (isFullScreen.value) return 'h-full'
-  return isHeaderVisible.value ? 'max-h-40' : 'max-h-64'
+  return isHeaderVisible.value ? 'max-h-40' : 'max-h-80'
 })
 </script>
 
 <template>
-  <div class="flex transition-all duration-300 ease-in-out" :class="containerClasses">
+  <div
+    class="mb-4 flex w-full transition-all duration-300 ease-in-out md:justify-center"
+    :class="containerClasses"
+  >
     <div
       :class="cardWidthClass"
-      class="flex flex-col space-y-4 rounded-lg border border-accentPrimary bg-baseMedium p-6 shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
+      class="flex h-full flex-col space-y-4 rounded-lg border border-accentPrimary bg-baseMedium p-6 shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
     >
-      <header :class="{ 'justify-end': !isFullScreen }" class="flex w-full">
+      <header class="flex w-full">
         <Button
           type="button"
-          class="sticky flex cursor-pointer justify-end bg-neutral-800 hover:bg-neutral-700"
+          class="ml-auto flex cursor-pointer bg-gray-300 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
           title="Cliquez pour agrandir"
-          v-if="!isFullScreen"
+          v-if="!isFullScreen || !isFullScreenRoute"
           @click="goToJobDetailsPage"
         >
           <Maximize2 class="transition hover:text-primary" :size="24" />
         </Button>
         <Button
           type="button"
-          class="bg-neutral-800 p-0 hover:bg-neutral-700"
+          class="justify-start bg-gray-300 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
           title="Cliquez pour revenir en arrière"
-          v-if="isFullScreen"
+          v-if="isFullScreen && isFullScreenRoute"
           @click="router.back()"
         >
           <ArrowLeft class="mb-1 scale-125 cursor-pointer transition" />

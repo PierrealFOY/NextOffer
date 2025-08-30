@@ -1,7 +1,8 @@
 <template>
   <div
+    v-show="isHeaderVisible"
     :class="{ 'pl-6': isMobile }"
-    class="flex items-baseline justify-center gap-2 text-xl text-accentPrimary dark:text-mintGreen"
+    class="mx-auto flex items-baseline justify-center gap-2 text-xl text-accentPrimary dark:text-mintGreen"
   >
     <Search @search="handleSearch" />
   </div>
@@ -10,10 +11,13 @@
 <script setup lang="ts">
 import { useSidebar } from '@/components/ui/sidebar'
 import Search from '../components/Search.vue'
+import { inject, ref } from 'vue'
 const { isMobile } = useSidebar()
 
 const emit = defineEmits(['search'])
 const handleSearch = (query: string) => {
   emit('search', query)
 }
+
+const isHeaderVisible = inject('isHeaderVisible', ref(true))
 </script>
