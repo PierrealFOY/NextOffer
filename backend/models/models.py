@@ -20,31 +20,6 @@ class Job(Base):
     dateCreation = Column(DateTime, default=datetime.now(timezone.utc))
     liked = Column(Boolean, default=False)
 
-    def __init__(self,
-                    external_id: Optional[str],
-                    title: str,
-                    company: str,
-                    url: str,
-                    source: str,
-                    location: str,
-                    salary: str,
-                    description: str,
-                    typeContrat: str,
-                    dateCreation: date,
-                    liked: Optional[bool] = False,
-                ):
-        self.external_id = external_id
-        self.title = title
-        self.company = company
-        self.url = url
-        self.source = source
-        self.location = location
-        self.salary = salary
-        self.description = description
-        self.typeContrat = typeContrat
-        self.dateCreation = dateCreation
-        self.liked = liked
-
     def to_dict(self):
         if isinstance(self.dateCreation, str):
             try:
