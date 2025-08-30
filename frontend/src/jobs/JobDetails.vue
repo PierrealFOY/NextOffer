@@ -27,9 +27,9 @@ const props = defineProps<{
 
 const route = useRoute()
 const router = useRouter()
-const jobId = computed(() => route.params.jobId as string)
+const jobId = computed(() => route.params.jobId)
 const jobStore = useJobStore()
-const jobFromStore = computed(() => jobStore.getJobById(jobId.value))
+const jobFromStore = computed(() => jobStore.getJobById(Number(jobId.value)))
 const jobData = computed(() => props.job ?? jobFromStore.value)
 
 const sanitizedDescription = computed(() =>

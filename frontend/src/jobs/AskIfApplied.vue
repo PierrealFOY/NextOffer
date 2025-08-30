@@ -10,7 +10,7 @@ const props = defineProps<{
 }>()
 
 const store = useJobStore()
-const handleAppliedJobUpdate = async (jobId: string) => {
+const handleAppliedJobUpdate = async (jobId: number) => {
   if (!jobId) {
     console.log('Job ID is missing')
   }
