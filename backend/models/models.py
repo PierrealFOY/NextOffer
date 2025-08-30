@@ -95,7 +95,7 @@ class LikedJob(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    job_id = Column(String, ForeignKey("jobs.id"))
+    job_id = Column(Integer, ForeignKey("jobs.id"))
 
     user = relationship("User", back_populates="liked_jobs")
     job = relationship("Job", lazy="joined")
