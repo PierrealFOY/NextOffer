@@ -19,6 +19,7 @@ export const useJobStore = defineStore('jobStore', {
     offset: 0,
     limit: 20,
     searchQuery: '',
+    searchResults: 0,
   }),
   getters: {
     isJobAlreadyLiked: (state) => (jobId: number) => {
@@ -41,7 +42,8 @@ export const useJobStore = defineStore('jobStore', {
         (job) =>
           (job.title && job.title.toLowerCase().includes(lowerQuery)) ||
           (job.company && job.company.toLowerCase().includes(lowerQuery)) ||
-          (job.location && job.location.toLowerCase().includes(lowerQuery)),
+          (job.location && job.location.toLowerCase().includes(lowerQuery)) ||
+          (job.description && job.description.toLowerCase().includes(lowerQuery)),
       )
     },
   },

@@ -1,0 +1,19 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# -------------------------------
+# Jobs d'importation toutes les 6 heures
+# à 6h, 10h, 14h et 18h (UTC ou heure locale si TZ=Europe/Paris)
+# -------------------------------
+4 6,10,14,18,22 * * * root echo "=== CRON JOB START $(date) ===" >> /var/log/cron.log && /usr/bin/curl -s -X POST -H "Content-Type: application/json" -d '{}' --retry 5 --retry-delay 5 http://localhost:8000/api/jobs/import >> /var/log/cron.log 2>&1 && echo "=== CRON JOB END $(date) ===" >> /var/log/cron.log
+
+# -------------------------------
+# Job supplémentaire à 21h10 (UTC ou ajusté selon fuseau) -> TEST
+# -------------------------------
+# 52 21 * * * root echo "=== CRON JOB START $(date) ===" >> /var/log/cron.log && /usr/bin/curl -s -X POST -H "Content-Type: application/json" -d '{}' --retry 5 --retry-delay 5 http://localhost:8000/api/jobs/import >> /var/log/cron.log 2>&1 && echo "=== CRON JOB END $(date) ===" >> /var/log/cron.log
+
+
+# -------------------------------
+# Vérification que cron tourne (toutes les minutes)
+# -------------------------------
+* * * * * root echo "CRON OK $(date)" >> /var/log/cron.log 2>&1
