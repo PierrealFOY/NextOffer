@@ -22,7 +22,24 @@
 
       <!-- <SidebarWrapper /> -->
 
-      <TerminalHeader class="w-4/5" @search="handleSearch" />
+      <div class="flex w-full flex-col items-center space-y-3">
+        <TerminalHeader class="w-full justify-center" @search="handleSearch" />
+        <div :class="{ hidden: !isJobViewRoute }" class="flex flex-row justify-center">
+          <span
+            class="flex flex-row space-x-2"
+            v-if="!isSearchQueryEmpty && jobStore.searchResults > 0"
+            ><p class="pr-2">{{ jobStore.searchResults }}</p>
+            résultats trouvés pour:
+            <p class="italic text-accentPrimary dark:text-mintGreen">
+              {{ jobStore.searchQuery }}
+            </p></span
+          >
+          <span class=" " v-if="jobStore.searchResults === 0"
+            >aucun résultat trouvé... pour:
+            <p class="font-italic">{{ jobStore.searchQuery }}</p></span
+          >
+        </div>
+      </div>
       <span ref="sentinelRef" class="h-[1px] w-full"></span>
 
       <RouterView class="h-full w-full" v-slot="{ Component }" :is-loading="jobStore.isLoading">
@@ -37,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, provide, watch } from 'vue'
+import { ref, onMounted, onUnmounted, provide, watch, computed } from 'vue'
 import { useJobStore } from '@/stores/jobStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useSidebar } from '@/components/ui/sidebar'
@@ -45,12 +62,18 @@ import TerminalHeader from '../layout/TerminalHeader.vue'
 import ToggleMode from '../layout/ToggleMode.vue'
 import { Menu } from 'lucide-vue-next'
 import { useDeviceDetection } from '@/utils/useDeviceDetection'
+import { useRoute } from 'vue-router'
 
+// Routes
+const route = useRoute()
+const isJobViewRoute = computed(() => route.path === '/offers')
+
+// store
 const authStore = useAuthStore()
 const jobStore = useJobStore()
-
 // search
 const handleSearch = (query: string) => jobStore.setSearchQuery(query)
+const isSearchQueryEmpty = computed(() => jobStore.searchQuery === '')
 
 // Sidebar mobile
 const { isMobileDevice, isLandscape, isTabletDevice, isDesktopDevice } = useDeviceDetection()
@@ -103,6 +126,15 @@ watch(
         await jobStore.fetchJobs()
       }
       await jobStore.clearAndFetchUserJobStatuses()
+    }
+  },
+  { immediate: true },
+)
+watch(
+  () => jobStore.displayedJobs,
+  async (newResults) => {
+    if (newResults) {
+      jobStore.searchResults = newResults.length
     }
   },
   { immediate: true },

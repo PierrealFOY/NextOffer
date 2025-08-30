@@ -51,7 +51,7 @@ const containerClasses = computed(() => {
   if (isFullScreen.value) {
     return open.value ? 'mt-10 w-[90vw]' : 'mt-10 w-[85vw] pb-10 overflow-y-auto overflow-x-hidden'
   }
-  return isHeaderVisible.value ? 'top-16 mt-16 h-[68%]' : 'top-2 mt-0 h-[85vh]'
+  return isHeaderVisible.value ? 'top-16 mt-16 h-[68%]' : 'top-2 mt-0 h-[90%]'
 })
 
 const cardWidthClass = computed(() => {
@@ -61,7 +61,7 @@ const cardWidthClass = computed(() => {
 
 const descriptionHeightClass = computed(() => {
   if (isFullScreen.value) return 'h-full'
-  return isHeaderVisible.value ? 'max-h-40' : 'max-h-64'
+  return isHeaderVisible.value ? 'max-h-40' : 'max-h-80'
 })
 </script>
 
@@ -72,7 +72,7 @@ const descriptionHeightClass = computed(() => {
   >
     <div
       :class="cardWidthClass"
-      class="flex h-fit flex-col space-y-4 rounded-lg border border-accentPrimary bg-baseMedium p-6 shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
+      class="flex h-full flex-col space-y-4 rounded-lg border border-accentPrimary bg-baseMedium p-6 shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
     >
       <header class="flex w-full">
         <Button
