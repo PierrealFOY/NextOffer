@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+import datetime
+import logging
+
+logging.basicConfig(filename='/var/log/cron.log', level=logging.INFO)
+
+try:
+    current_time = datetime.datetime.now()
+    logging.info("Cron job has run at %s" % current_time)
+except Exception as e:
+    logging.error("An error occurred: %s" % str(e))

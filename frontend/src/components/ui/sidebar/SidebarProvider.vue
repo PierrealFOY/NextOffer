@@ -11,6 +11,7 @@ import {
   SIDEBAR_WIDTH,
   SIDEBAR_WIDTH_ICON,
 } from './utils'
+import { useDeviceDetection } from '@/utils/useDeviceDetection'
 
 const props = withDefaults(
   defineProps<{
@@ -31,6 +32,8 @@ const emits = defineEmits<{
 const isMobile = useMediaQuery('(max-width: 768px)')
 const openMobile = ref(false)
 
+const { isTabletDevice, isLandscape } = useDeviceDetection()
+
 const open = useVModel(props, 'open', emits, {
   defaultValue: props.defaultOpen ?? false,
   passive: (props.open === undefined) as false,
@@ -47,9 +50,10 @@ function setOpenMobile(value: boolean) {
   openMobile.value = value
 }
 
-// Helper to toggle the sidebar.
 const toggleSidebar = () => {
-  return isMobile.value ? setOpenMobile(!openMobile.value) : setOpen(!open.value)
+  return isMobile.value || isTabletDevice.value
+    ? setOpenMobile(!openMobile.value)
+    : setOpen(!open.value)
 }
 
 useEventListener('keydown', (event: KeyboardEvent) => {
@@ -71,6 +75,7 @@ provideSidebarContext({
   openMobile,
   setOpenMobile,
   toggleSidebar,
+  isLandscape,
 })
 </script>
 
@@ -91,8 +96,10 @@ provideSidebarContext({
     >
       <slot
         :isMobile="isMobile"
+        :isTablet="isTabletDevice"
         :open="open"
         :openMobile="openMobile"
+        :is-landscape="isLandscape"
         @toggleSidebar="toggleSidebar"
       />
     </div>

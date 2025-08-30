@@ -3,7 +3,9 @@ from typing import List, Optional
 from pydantic import BaseModel, field_validator, ConfigDict
 
 class JobBase(BaseModel):
-    id: str
+    # on creation, id is None because not yet created
+    id: Optional[int] = None
+    external_id: Optional[str] = None
     title: str
     company: str
     url: str
@@ -12,7 +14,7 @@ class JobBase(BaseModel):
     salary: str
     description: str
     typeContrat: str
-    dateCreation: date  # Laisse le type natif
+    dateCreation: datetime
     liked: Optional[bool] = False
 
     model_config = ConfigDict(from_attributes=True)
@@ -22,26 +24,41 @@ class JobBase(BaseModel):
     def parse_date(cls, v):
         if isinstance(v, str):
             try:
-                return datetime.strptime(v, "%d/%m/%Y").date()
+                # Correct format for Remotive dates
+                return datetime.fromisoformat(v.replace('Z', '+00:00'))
             except ValueError:
                 try:
-                    return datetime.fromisoformat(v.replace('Z', '+00:00')).date()
+                    # Correct format for France Travail dates
+                    return datetime.strptime(v, "%d/%m/%Y")
                 except ValueError:
-                    return date.today()
+                    # Return a default datetime if parsing fails
+                    return datetime.now()
+        # If input is already a date or datetime, return it as datetime
+        if isinstance(v, date):
+            return datetime(v.year, v.month, v.day)
         return v
 
 class JobResponse(JobBase):
+    id: int
     @field_validator("dateCreation", mode="after")
     @classmethod
-    def format_date(cls, v: date):
+    def format_date(cls, v: datetime):
         return v.strftime("%d/%m/%Y") if isinstance(v, date) else v
-    
 
 class LikedJobSchema(BaseModel):
     job: JobResponse
 
     model_config = ConfigDict(from_attributes=True)
 
+class SeenJobSchema(BaseModel):
+    job: JobResponse
+
+    model_config = ConfigDict(from_attributes=True)
+
+class AppliedJobSchema(BaseModel):
+    job: JobResponse
+
+    model_config = ConfigDict(from_attributes=True)
 
 class UserCreate(BaseModel):
     username: str
@@ -57,6 +74,8 @@ class UserSchema(BaseModel):
     reset_password_expires_at: Optional[datetime] = None
     # favorite_jobs: List[JobResponse] = [] # keep JObResponse or serialize bug
     liked_jobs: List[LikedJobSchema] # keep JObResponse or serialize bug
+    seen_jobs: List[SeenJobSchema]
+    applied_jobs: List[AppliedJobSchema]
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -74,6 +93,8 @@ class UserResponse(BaseModel):
     reset_password_token: Optional[str] = None
     reset_password_expires_at: Optional[datetime] = None
     liked_jobs: List[LikedJobSchema] = []
+    seen_jobs: List[SeenJobSchema] = []
+    applied_jobs: List[SeenJobSchema] = []
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -1,59 +1,69 @@
 <template>
   <div
-    :class="{
-      'opacity-[40%]': job.seen && applyOpacity,
-    }"
-    @click="goToJobDetails(job)"
-    class="flex cursor-pointer rounded border bg-card p-4 shadow-br-light hover:bg-muted hover:shadow-md dark:bg-neutral-800 dark:shadow-br-dark"
+    class="rounded border bg-card p-4 shadow-br-light hover:bg-muted hover:shadow-md dark:bg-neutral-800 dark:shadow-br-dark"
   >
-    <div class="flex w-full flex-col items-baseline gap-4 pb-2 text-foreground">
-      <h2 class="flex items-baseline space-x-2 text-sm text-foreground">
-        <span><BriefcaseBusiness /></span>
-        <strong>{{ job?.title }}</strong>
-      </h2>
-      <div class="flex items-baseline space-x-2 text-sm">
-        <span><Building2 /></span>
-        <p class="italic">{{ job?.company }}</p>
+    <div
+      :class="{
+        'opacity-[40%]': job.seen && applyOpacity,
+      }"
+      @click="goToJobDetails(job)"
+      class="flex cursor-pointer"
+    >
+      <div class="flex w-full flex-col items-baseline gap-4 pb-2 text-foreground">
+        <h2 class="flex items-baseline space-x-2 text-sm text-foreground">
+          <span><BriefcaseBusiness /></span>
+          <strong>{{ job?.title }}</strong>
+        </h2>
+        <div class="flex items-baseline space-x-2 text-sm">
+          <span><Building2 /></span>
+          <p class="italic">{{ job?.company }}</p>
+        </div>
+        <div class="flex items-baseline space-x-2 text-sm" @click.stop>
+          <span><MapPin /></span>
+          <p class="italic">{{ job?.location }}</p>
+        </div>
+        <div class="flex items-baseline space-x-2 text-sm" @click.stop>
+          <span><Calendar /></span>
+          <p class="italic">{{ dateCreationFormatted }}</p>
+        </div>
+        <div>
+          <a
+            type="button"
+            :href="job.url"
+            target="_blank"
+            class="cursor-pointer text-base text-accentSecondary underline transition hover:text-primary"
+            @click="(event) => jobSeen(job.id)"
+          >
+            Voir l'offre
+          </a>
+        </div>
       </div>
-      <div class="flex items-baseline space-x-2 text-sm" @click.stop>
-        <span><MapPin /></span>
-        <p class="italic">{{ job?.location }}</p>
-      </div>
-      <div class="flex items-baseline space-x-2 text-sm" @click.stop>
-        <span><Calendar /></span>
-        <p class="italic">{{ dateCreationFormatted }}</p>
-      </div>
-      <div>
-        <a
-          type="button"
-          :href="job.url"
-          target="_blank"
-          class="cursor-pointer text-base text-accentSecondary underline transition hover:text-primary"
-          @click="jobSeen"
-        >
-          Voir l'offre
-        </a>
+
+      <div class="ml-8 flex items-center justify-center space-x-4">
+        <div typeof="button" class="cursor-pointer justify-end" @click.stop="handletoggleLikeJob">
+          <Heart
+            :class="{
+              'fill-green-700 text-green-700': job.liked,
+              'text-green-700': !job.liked,
+              'dark:fill-mintGreen dark:text-mintGreen': job.liked,
+              'dark:text-mintGreen': !job.liked,
+            }"
+            type="button"
+          />
+        </div>
+        <div v-if="job.seen">
+          <Eye class="text-accentPrimary dark:text-mintGreen" />
+        </div>
+        <div v-if="job.applicationSent">
+          <Send class="text-accentPrimary dark:text-mintGreen" />
+        </div>
       </div>
     </div>
-
-    <div class="ml-8 flex items-center justify-center space-x-4">
-      <div typeof="button" class="cursor-pointer justify-end" @click.stop="handletoggleLikeJob">
-        <Heart
-          :class="{
-            'fill-green-700 text-green-700': job.liked,
-            'text-green-700': !job.liked,
-            'dark:fill-mintGreen dark:text-mintGreen': job.liked,
-            'dark:text-mintGreen': !job.liked,
-          }"
-          type="button"
-        />
-      </div>
-      <div v-if="job.seen">
-        <Eye class="text-accentPrimary dark:text-mintGreen" />
-      </div>
-      <div v-if="job.applicationSent">
-        <Send class="text-accentPrimary dark:text-mintGreen" />
-      </div>
+    <div v-if="job.seen && !job.applicationSent" class="pt-4 text-center">
+      <AskIfApplied
+        class="mx-auto mb-4 w-2/3 rounded border-t border-accentPrimary text-center dark:border-mintGreen"
+        :job="job"
+      />
     </div>
   </div>
 </template>
@@ -62,12 +72,12 @@
 import { Building2, BriefcaseBusiness, MapPin, Heart, Eye, Send, Calendar } from 'lucide-vue-next'
 import type { Job } from '../types/Job'
 import { useToast } from '@/components/ui/toast/use-toast'
-import ToastHeartFillUp from '@/animations/ToastHeartFillUp.vue'
-import { computed, h } from 'vue'
+import { computed } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useJobStore } from '@/stores/jobStore'
 import { useRoute, useRouter } from 'vue-router'
 import { useSidebar } from '@/components/ui/sidebar'
+import AskIfApplied from './AskIfApplied.vue'
 
 const authStore = useAuthStore()
 
@@ -78,8 +88,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:liked', jobId: string): void
-  (e: 'update:seen', jobId: string): void
   (e: 'select', job: Job): void
 }>()
 
@@ -96,17 +104,15 @@ const handletoggleLikeJob = async () => {
   }
 
   await jobStore.toggleLikeWithFeedback(props.job.id)
-  emit('update:liked', props.job.id)
 }
 
-
-const jobSeen = (jobId: string) => {
+const jobSeen = async (jobId: number) => {
+  await jobStore.seeJob(jobId)
   if (props.job.url) {
     window.open(props.job.url, '_blank')
   } else {
-    goToJobDetails(jobId)
+    goToJobDetails(props.job)
   }
-  emit('update:seen', props.job.id)
 }
 
 const dateCreationFormatted = computed(() => {
@@ -119,9 +125,9 @@ const dateCreationFormatted = computed(() => {
 
 const route = useRoute()
 const router = useRouter()
-const jobId = computed(() => route.params.jobId as string)
+const jobId = computed(() => route.params.jobId)
 const jobStore = useJobStore()
-const jobFromStore = computed(() => jobStore.getJobById(jobId.value))
+const jobFromStore = computed(() => jobStore.getJobById(Number(jobId.value)))
 const jobData = computed(() => props.job ?? jobFromStore.value)
 const { isMobile } = useSidebar()
 const goToJobDetails = (job: Job) => {

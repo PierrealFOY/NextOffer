@@ -2,12 +2,13 @@ from typing import Optional
 from sqlalchemy import Column, Integer, String, Boolean, Text, DateTime, Date, Table, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 class Job(Base):
     __tablename__ = 'jobs'
 
-    id = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True) # ID from DB
+    external_id = Column(String, unique=True) # ID from DB
     title = Column(String)
     company = Column(String)
     url = Column(String)
@@ -16,12 +17,11 @@ class Job(Base):
     salary = Column(String)
     description = Column(Text)
     typeContrat = Column(String)
-    dateCreation = Column(Date)
-    users = relationship("User", secondary="liked_jobs")
+    dateCreation = Column(DateTime, default=datetime.now(timezone.utc))
     liked = Column(Boolean, default=False)
 
     def __init__(self,
-                    id: str,
+                    external_id: Optional[str],
                     title: str,
                     company: str,
                     url: str,
@@ -33,7 +33,7 @@ class Job(Base):
                     dateCreation: date,
                     liked: Optional[bool] = False,
                 ):
-        self.id = id
+        self.external_id = external_id
         self.title = title
         self.company = company
         self.url = url
@@ -81,14 +81,9 @@ class User(Base):
     reset_password_expires_at = Column(DateTime, nullable=True)
     # favorite_jobs = relationship("Job", secondary="favorite_jobs")
     liked_jobs = relationship("LikedJob", back_populates="user")
+    seen_jobs = relationship("SeenJob", back_populates="user")
+    applied_jobs = relationship("AppliedJob", back_populates="user")
     # jobs = relationship("Job", secondary="liked_jobs")
-
-# class FavoriteJob(Base):
-#     __tablename__ = "favorite_jobs"
-    
-#     id = Column(Integer, primary_key=True, index=True)
-#     user_id = Column(Integer, ForeignKey("users.id"))
-#     job_id = Column(String, ForeignKey("jobs.id"))
 
 class LikedJob(Base):
     __tablename__ = "liked_jobs"
@@ -98,4 +93,24 @@ class LikedJob(Base):
     job_id = Column(Integer, ForeignKey("jobs.id"))
 
     user = relationship("User", back_populates="liked_jobs")
+    job = relationship("Job", lazy="joined")
+
+class SeenJob(Base):
+    __tablename__ = "seen_jobs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    job_id = Column(Integer, ForeignKey("jobs.id"))
+
+    user = relationship("User", back_populates="seen_jobs")
+    job = relationship("Job", lazy="joined")
+
+class AppliedJob(Base):
+    __tablename__ = "applied_jobs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    job_id = Column(Integer, ForeignKey("jobs.id"))
+
+    user = relationship("User", back_populates="applied_jobs")
     job = relationship("Job", lazy="joined")
