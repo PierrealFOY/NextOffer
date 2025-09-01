@@ -15,6 +15,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # to create table (to be called on starting)
 def create_db_tables():
+    # checkfirst=True will not create the table if it already exists
     Base.metadata.create_all(bind=engine, checkfirst=True)
 
 # to get a DB session
