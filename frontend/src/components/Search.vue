@@ -13,7 +13,7 @@
         ref="searchInput"
         v-model="searchQuery"
         type="text"
-        class="w-3/4 border-b border-accentPrimary bg-transparent p-1 px-1 pl-2 text-sm text-accentPrimary placeholder:text-accentPrimary focus:w-full focus:outline-none dark:border-mintGreen dark:text-mintGreen dark:placeholder:text-mintGreen"
+        class="w-3/4 bg-transparent p-1 px-1 pl-2 text-sm text-accentPrimary placeholder:text-accentPrimary focus:w-full focus:outline-none dark:border-mintGreen dark:text-mintGreen dark:placeholder:text-mintGreen"
         :class="{ 'animate-pulseSlow': !isSearchActive }"
         :placeholder="isSearchActive ? '' : 'Rechercher _'"
         @keyup.enter="handleSearch"
@@ -70,6 +70,6 @@ const handleSearch = () => {
 }
 
 .animate-pulseSlow {
-  animation: pulseSlow 1.5s infinite;
+  animation: pulseSlow 2s infinite;
 }
 </style>
