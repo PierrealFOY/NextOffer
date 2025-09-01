@@ -14,6 +14,8 @@ certbot-etc/live/nextoffer.cloud/privkey.pem
 certbot-etc/
 certbot/
 
+nginx/logs/
+
 
 ./certbot-etc/
 
