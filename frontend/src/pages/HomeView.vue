@@ -53,7 +53,7 @@ setTimeout(() => {
 const goToJobs = () => {
   router.push('/offers')
 }
-const { isMobile, open } = useSidebar()
+const { isMobile } = useSidebar()
 </script>
 
 <template>
@@ -76,7 +76,7 @@ const { isMobile, open } = useSidebar()
           class="mb-4 flex justify-center text-center text-2xl font-extrabold md:text-4xl"
         >
           <TextShadow v-if="!isMobile" class="leading-12">Trouvez l'emploi idéal</TextShadow>
-          <p v-else-if="isMobile" class="leading-12 pl-8">Trouvez l'emploi idéal</p>
+          <p v-else-if="isMobile" class="leading-12">Trouvez l'emploi idéal</p>
         </h1>
         <p ref="heroSubtitle" class="mb-8 text-lg text-muted-foreground md:text-xl">
           Accédez à des milliers d'offres d'emploi en présentiel, en télétravail ou en hybride,
