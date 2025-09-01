@@ -78,6 +78,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { useJobStore } from '@/stores/jobStore'
 import { useRouter } from 'vue-router'
 import AskIfApplied from './AskIfApplied.vue'
+import { useSidebar } from '@/components/ui/sidebar'
 
 const authStore = useAuthStore()
 
@@ -123,15 +124,17 @@ const dateCreationFormatted = computed(() => {
   })
 })
 
-// const route = useRoute()
 const router = useRouter()
-// const jobId = computed(() => route.params.jobId)
 const jobStore = useJobStore()
-// const jobFromStore = computed(() => jobStore.getJobById(Number(jobId.value)))
-// const jobData = computed(() => props.job ?? jobFromStore.value)
+
+const { isMobile } = useSidebar()
 const goToJobDetails = (job: Job) => {
-  if (job.id) {
+  if (isMobile.value) {
+    // Mobile : navigation fullscreen
     router.push(`/jobDetails/${job.id}`)
+  } else {
+    // Desktop : emit pour que JobList mette selectedJob
+    emit('select', job)
   }
 }
 </script>
