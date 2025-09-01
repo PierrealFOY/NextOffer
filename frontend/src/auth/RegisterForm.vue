@@ -27,7 +27,7 @@ const formSchema = toTypedSchema(
         message: 'Le mot de passe doit contenir au moins 6 caractères.',
       }),
       confirmPassword: z.string().min(6, {
-        // Ajout d'un champ pour la confirmation
+        // Add a confirmation password field
         message: 'Veuillez confirmer votre mot de passe.',
       }),
     })
@@ -37,7 +37,6 @@ const formSchema = toTypedSchema(
     }),
 )
 
-// 2. Initialisation du formulaire
 const form = useForm({
   validationSchema: formSchema,
 })
@@ -46,7 +45,6 @@ const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 const isLoading = ref(false)
 
-// 3. Fonction de soumission
 const onSubmit = form.handleSubmit(async (values) => {
   errorMessage.value = null
   successMessage.value = null
