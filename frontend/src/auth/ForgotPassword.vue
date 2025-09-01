@@ -1,18 +1,21 @@
 <template>
-  <div>
-    <Card class="w-3/4 p-4">
-      <form @submit="onSubmit">
-        <h3>Mot de passe oublié</h3>
+  <div class="mt-20 flex justify-center">
+    <Card
+      :class="{ 'mx-2 h-1/2 w-[90%]': isMobile, 'h-2/3 w-1/2': !isMobile }"
+      class="flex flex-col border border-accentPrimary p-4 text-center shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
+    >
+      <form class="self-center" @submit="onSubmit">
+        <h2 class="mb-10 mt-2 text-2xl">Mot de passe oublié</h2>
 
-        <div class="w-1/2">
+        <div class="flex w-full flex-col self-center text-center">
           <FormField v-slot="{ componentField }" :form="form" name="email">
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
-                  class="dark:border-mintGreen"
+                  class="border-accentPrimary dark:border-mintGreen"
                   type="text"
-                  placeholder="johndoe"
+                  placeholder="johndoe@example.com"
                   v-bind="componentField"
                 />
               </FormControl>
@@ -21,7 +24,10 @@
           </FormField>
 
           <div class="pt-8">
-            <Button type="submit" class="w-full bg-accentPrimary dark:bg-mintGreen dark:text-black">
+            <Button
+              type="submit"
+              class="w-full rounded bg-accentPrimary p-1 text-white dark:bg-mintGreen dark:text-black"
+            >
               <span>Envoyer la demande</span>
             </Button>
           </div>
@@ -44,6 +50,7 @@ import { Card } from '@/components/ui/card'
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import FormLabel from '@/components/ui/form/FormLabel.vue'
 import { Input } from '@/components/ui/input'
+import { useSidebar } from '@/components/ui/sidebar'
 import { useToast } from '@/components/ui/toast'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
@@ -102,4 +109,6 @@ const onSubmit = form.handleSubmit(async (values) => {
     isSubmitting.value = false
   }
 })
+
+const { isMobile } = useSidebar()
 </script>
