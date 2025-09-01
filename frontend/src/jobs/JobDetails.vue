@@ -11,7 +11,7 @@ import {
   Maximize2,
   ArrowLeft,
 } from 'lucide-vue-next'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { inject } from 'vue'
@@ -27,10 +27,17 @@ const props = defineProps<{
 
 const route = useRoute()
 const router = useRouter()
-const jobId = computed(() => route.params.jobId)
+const jobId = computed<number | null>(() => {
+  const id = route.params.jobId
+  if (!id) return null
+  return Array.isArray(id) ? Number(id[0]) : Number(id)
+})
 const jobStore = useJobStore()
 const jobFromStore = computed(() => jobStore.getJobById(Number(jobId.value)))
-const jobData = computed(() => props.job ?? jobFromStore.value)
+const jobFromApi = ref<Job | null>(null)
+const jobData = computed<Job | null>(() => {
+  return props.job ?? jobFromStore.value ?? jobFromApi.value ?? null
+})
 
 const sanitizedDescription = computed(() =>
   jobData.value?.description ? DOMPurify.sanitize(jobData.value.description) : '',
@@ -43,6 +50,15 @@ const goToJobDetailsPage = () => {
     router.push(`/jobDetails/${jobData.value.id}`)
   }
 }
+
+const goBack = () => {
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push('/offers')
+  }
+}
+
 const { isMobile, open } = useSidebar()
 const isHeaderVisible = inject('isHeaderVisible', ref(true))
 
@@ -61,20 +77,27 @@ const cardWidthClass = computed(() => {
 
 const descriptionHeightClass = computed(() => {
   if (isFullScreen.value) return 'h-full'
+  if (isMobile.value) return 'mt-6 w-[90vw] justify-center -mx-1'
   return isHeaderVisible.value ? 'max-h-40' : 'max-h-80'
+})
+
+onMounted(async () => {
+  if (!jobFromStore.value && jobId.value) {
+    jobFromApi.value = await jobStore.fetchJobById(jobId.value)
+  }
 })
 </script>
 
 <template>
   <div
-    class="mb-4 flex w-full transition-all duration-300 ease-in-out md:justify-center"
+    class="flex w-full pb-10 transition-all duration-300 ease-in-out md:justify-center"
     :class="containerClasses"
   >
     <div
       :class="cardWidthClass"
-      class="flex h-full flex-col space-y-4 rounded-lg border border-accentPrimary bg-baseMedium p-6 shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
+      class="flex h-full min-h-0 flex-col space-y-4 overflow-hidden rounded-lg border border-accentPrimary bg-baseMedium p-6 shadow-br-light dark:border-mintGreen dark:bg-neutral-800 dark:shadow-br-dark"
     >
-      <header class="flex w-full">
+      <header class="flex min-h-0 w-full">
         <Button
           type="button"
           class="ml-auto flex cursor-pointer bg-gray-300 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
@@ -89,7 +112,7 @@ const descriptionHeightClass = computed(() => {
           class="justify-start bg-gray-300 hover:bg-gray-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
           title="Cliquez pour revenir en arrière"
           v-if="isFullScreen && isFullScreenRoute"
-          @click="router.back()"
+          @click="goBack"
         >
           <ArrowLeft class="mb-1 scale-125 cursor-pointer transition" />
         </Button>
@@ -122,14 +145,14 @@ const descriptionHeightClass = computed(() => {
         </div>
       </div>
 
-      <div class="pt-4">
+      <div class="min-h-0 flex-1 pt-4">
         <div class="flex items-center space-x-2 pb-2">
           <NotepadText :size="18" />
           <p class="font-medium">Description du poste :</p>
         </div>
         <div
           :class="descriptionHeightClass"
-          class="overflow-y-auto overflow-x-hidden break-words rounded bg-white/5 p-2 text-sm leading-relaxed transition-all duration-300 ease-in-out"
+          class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden break-words rounded bg-white/5 p-2 pb-4 text-sm leading-relaxed transition-all duration-300 ease-in-out"
         >
           <div
             v-if="jobData?.description"

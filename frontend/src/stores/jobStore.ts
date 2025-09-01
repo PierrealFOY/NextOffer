@@ -121,14 +121,14 @@ export const useJobStore = defineStore('jobStore', {
         return []
       }
     },
-    async fetchJobById(id: string) {
+    async fetchJobById(id: number) {
       try {
         const res = await fetch(`${API_URL}/api/jobs/${id}`)
 
         if (!res.ok) {
           const errorText = await res.text()
           console.error(`HTTP error! status: ${res.status}, body: ${errorText}`)
-          return
+          return null
         }
 
         const data: Job = await res.json()

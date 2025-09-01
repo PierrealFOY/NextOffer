@@ -31,8 +31,9 @@
             type="button"
             :href="job.url"
             target="_blank"
+            rel="noopener noreferrer"
             class="cursor-pointer text-base text-accentSecondary underline transition hover:text-primary"
-            @click="(event) => jobSeen(job.id)"
+            @click.stop="(event) => markJobSeen(job.id)"
           >
             Voir l'offre
           </a>
@@ -75,8 +76,7 @@ import { useToast } from '@/components/ui/toast/use-toast'
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useJobStore } from '@/stores/jobStore'
-import { useRoute, useRouter } from 'vue-router'
-import { useSidebar } from '@/components/ui/sidebar'
+import { useRouter } from 'vue-router'
 import AskIfApplied from './AskIfApplied.vue'
 
 const authStore = useAuthStore()
@@ -106,7 +106,7 @@ const handletoggleLikeJob = async () => {
   await jobStore.toggleLikeWithFeedback(props.job.id)
 }
 
-const jobSeen = async (jobId: number) => {
+const markJobSeen = async (jobId: number) => {
   await jobStore.seeJob(jobId)
   if (props.job.url) {
     window.open(props.job.url, '_blank')
@@ -123,20 +123,15 @@ const dateCreationFormatted = computed(() => {
   })
 })
 
-const route = useRoute()
+// const route = useRoute()
 const router = useRouter()
-const jobId = computed(() => route.params.jobId)
+// const jobId = computed(() => route.params.jobId)
 const jobStore = useJobStore()
-const jobFromStore = computed(() => jobStore.getJobById(Number(jobId.value)))
-const jobData = computed(() => props.job ?? jobFromStore.value)
-const { isMobile } = useSidebar()
+// const jobFromStore = computed(() => jobStore.getJobById(Number(jobId.value)))
+// const jobData = computed(() => props.job ?? jobFromStore.value)
 const goToJobDetails = (job: Job) => {
-  if (!isMobile.value) {
-    emit('select', job)
-  } else if (isMobile.value) {
-    if (jobData.value?.id) {
-      router.push(`/jobDetails/${jobData.value.id}`)
-    }
+  if (job.id) {
+    router.push(`/jobDetails/${job.id}`)
   }
 }
 </script>
