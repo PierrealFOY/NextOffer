@@ -52,13 +52,13 @@ Ces API sont appelées côté backend pour récupérer, filtrer et exposer les o
 - Pour lancer en local :
 
 ```bash
-    docker-compose -f docker-compose.local.yml up --build
+    docker compose -f docker-compose.local.yml up --build
 ```
 
-- Pour lancer en production (sur VPS) :
+- Pour lancer un shell interactif dans un service :
 
 ```bash
-    docker-compose -f docker-compose.vps.yml up --build -d
+    docker exec -it <nom-du-service> sh
 ```
 
 ### ☎️ Contact
